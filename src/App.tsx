@@ -1,13 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+interface GamepadState {
+	id: string,
+	buttons: boolean[],
+}
+
+const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
+	if (a.buttons.length !== b.buttons.length) return false;
+	for (let i = 0; i < a.buttons.length; i++) {
+		if (a.buttons[i] !== b.buttons[i]) return false;
+	}
+	return true;
+};
 
 const App = () => {
+	const gamepadStates = useState<Record<string, GamepadState>>({});
+
 	useEffect(() => {
 		const step = () => {
-			navigator.getGamepads().forEach(gamepad => {
-				gamepad?.buttons.forEach((button, i) => {
-					if (button.value > 0) console.log(`gamepad ${gamepad.id} button ${i} pressed`);
-				});
-			});
+			const idsWithDifferentStates: string[] = [];
+			navigator.getGamepads().map(gp => {
+				if (gp === null) return null;
+				const result: GamepadState = {
+					id: gp.id,
+					buttons: gp.buttons.map(button => button.value > 0),
+				};
+				return result;
+			}); // loop over and check if states have changed
 
 			requestAnimationFrame(step);
 		};

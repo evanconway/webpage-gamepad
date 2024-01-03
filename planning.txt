@@ -1,0 +1,3 @@
+1st of January, 2024
+
+Need to figure out how to check gamepad state. The logic isn't too tricky, but we setup a request animation frame loop. If we're going to reference a component state within that loop, we'll have to resetup the requestAnimationFrame loop each time. I'm not quite sure how to do this atm. Will look at more later.
