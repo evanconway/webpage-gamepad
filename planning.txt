@@ -13,3 +13,11 @@ I'm not sure how axis are logged with this api. Let's add raw axis and button va
 So it looks like the id value for gamepads is actually like a product name. I assumed it was an UUID of some kind. It also looks like the different types of gamepads register dramatically different data for the axis and d-pad. For example, an xbox 360 controller registers full 0-1 inputs on 4 separate buttons for the d-pad, but the nintendo switch or pokken controller registers 9 distinctely different values on the same button for the d-pad. 
 
 Since we seem to get the name of the controller type from the api, we could probably hard code different logic for interpretting controls based on the gamepad id. Unfortuantely I don't have a good way to test this outside of literally acquiring a bunch of different controllers. For now, let's just hard code based on the id, and worry about expanding later.
+
+Ooh, actually, it looks like the d-pad for different controllers has a different default value. I wonder if we could make an educated guess on what kind of controller is plugged in based off that d-pad.
+
+I haven't seen any variation between axis on controllers, so we can assume an axis is two opposite directions on the same stick (for example -1 for left, 1 for right). Triggers also appear consistent, and we can basically treat those as regular buttons.
+
+I suppose another solution for the strange controller button values, is demanding the user maps all controls before using the app. On start the app could check the value of all buttons and axis and consider that "default", and any value other than those default values is considered a different input. I think this would technically work, but I'm not sure how we'd detect that what the user has pressed is "d-pad up", so we can show the user they've mapped "d-pad up" to a specific input.
+
+Right now, we simply detect if the value of a gamepad button/axis value has changed to determine if the application should update. I think we should create some sort of wrapper system that correctly detects what sort of changes count as a change.
