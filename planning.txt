@@ -1,3 +1,8 @@
 1st of January, 2024
 
 Need to figure out how to check gamepad state. The logic isn't too tricky, but we setup a request animation frame loop. If we're going to reference a component state within that loop, we'll have to resetup the requestAnimationFrame loop each time. I'm not quite sure how to do this atm. Will look at more later.
+
+
+3rd of January, 2024
+
+I'm not sure how axis are logged with this api. Let's add raw axis and button values to the tracked state, rig up a system that detects the last changed controller, plugin a controller and see what happens.

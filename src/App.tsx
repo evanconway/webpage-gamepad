@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface GamepadState {
 	id: string,
-	buttons: boolean[],
+	index: number,
+	buttons: number[],
 }
 
 const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
@@ -14,19 +15,32 @@ const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
 };
 
 const App = () => {
-	const gamepadStates = useState<Record<string, GamepadState>>({});
+	const gamepadStates = useRef<Record<string, GamepadState>>({});
+
+	const [lastUpdatedGamepad, setLastUpdatedGamepad] = useState<GamepadState | null>(null);
 
 	useEffect(() => {
 		const step = () => {
-			const idsWithDifferentStates: string[] = [];
-			navigator.getGamepads().map(gp => {
+			let indexToSetAsUpdatedGamepad: number | null = null;
+			navigator.getGamepads().map((gp, i) => {
 				if (gp === null) return null;
 				const result: GamepadState = {
 					id: gp.id,
-					buttons: gp.buttons.map(button => button.value > 0),
+					index: i,
+					buttons: [...gp.axes, ...gp.buttons.map(button => button.value)],
 				};
 				return result;
-			}); // loop over and check if states have changed
+			}).forEach(gp => {
+				if (gp === null) return;
+				// known anti-pattern, review later
+				if (gamepadStates.current[gp.index] === undefined || !gamepadStateEqual(gamepadStates.current[gp.index], gp)) {
+					gamepadStates.current[gp.index] = gp;
+					indexToSetAsUpdatedGamepad = gp.index;
+					return;
+				}
+			});
+
+			if (indexToSetAsUpdatedGamepad !== null) setLastUpdatedGamepad(gamepadStates.current[indexToSetAsUpdatedGamepad]);
 
 			requestAnimationFrame(step);
 		};
@@ -51,7 +65,16 @@ const App = () => {
 		};
 	}, []);
 
-	return <div>Hello World</div>;
+	if (lastUpdatedGamepad === null) return <div>no gamepad detected</div>;
+
+	return (
+		<div>
+			<div>{navigator.getGamepads()[lastUpdatedGamepad.index]?.id}</div>
+			<ul>
+				{lastUpdatedGamepad.buttons.map((value, i) => <li key={`${i}`}>{`button ${i}: ${value}`}</li>)}
+			</ul>;
+		</div>
+	);
 }
 
 export default App;
