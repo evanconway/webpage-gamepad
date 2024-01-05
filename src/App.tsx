@@ -3,10 +3,15 @@ import { useEffect, useRef, useState } from "react";
 interface GamepadState {
 	id: string,
 	index: number,
+	axis: readonly number[],
 	buttons: number[],
 }
 
 const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
+	if (a.axis.length !== b.axis.length) return false;
+	for (let i = 0; i < a.axis.length; i++) {
+		if (a.axis[i] !== b.axis[i]) return false;
+	}
 	if (a.buttons.length !== b.buttons.length) return false;
 	for (let i = 0; i < a.buttons.length; i++) {
 		if (a.buttons[i] !== b.buttons[i]) return false;
@@ -27,7 +32,8 @@ const App = () => {
 				const result: GamepadState = {
 					id: gp.id,
 					index: i,
-					buttons: [...gp.axes, ...gp.buttons.map(button => button.value)],
+					axis: gp.axes,
+					buttons: gp.buttons.map(button => button.value),
 				};
 				return result;
 			}).forEach(gp => {
@@ -49,13 +55,12 @@ const App = () => {
 
 		// setup gamepads
 		const onConnect = (e: GamepadEvent) => {
-			console.log(
-				'Gamepad connected at index %d: %s. %d buttons, %d axes.',
-				e.gamepad.index,
-				e.gamepad.id,
-				e.gamepad.buttons.length,
-				e.gamepad.axes.length,
-			);
+			//const gp = e.gamepad;
+			//console.log('Gamepad connected at index %d: %s. %d buttons, %d axes.', gp.index, gp.id, gp.buttons.length, gp.axes.length);
+			console.log('gamepads connection updated');
+			navigator.getGamepads().forEach(gp => {
+				if (gp !== undefined) console.log(gp?.id);
+			});
 		};
 
 		window.addEventListener('gamepadconnected', onConnect);
@@ -71,7 +76,8 @@ const App = () => {
 		<div>
 			<div>{navigator.getGamepads()[lastUpdatedGamepad.index]?.id}</div>
 			<ul>
-				{lastUpdatedGamepad.buttons.map((value, i) => <li key={`${i}`}>{`button ${i}: ${value}`}</li>)}
+				{lastUpdatedGamepad.axis.map((value, i) => <li key={i}>{`axis: ${i}: ${value}`}</li>)}
+				{lastUpdatedGamepad.buttons.map((value, i) => <li key={i}>{`button ${i}: ${value}`}</li>)}
 			</ul>;
 		</div>
 	);
