@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { GamepadChecker, getUnknownGamepadChecker, getXboxGamepadChecker } from "./gamepad";
+import { GamepadChecker, gamepadCheckerUnknown, gamepadCheckerXbox } from "./gamepad";
 
 interface GamepadState {
 	id: string,
@@ -64,8 +64,8 @@ const App = () => {
 			navigator.getGamepads().forEach(gp => {
 				if (gp === null) return;
 				console.log(gp.id);
-				if (gp.id.toLowerCase().startsWith('xbox')) gamepadIndexCheckersMap.current[gp.index] = getXboxGamepadChecker(gp);
-				else gamepadIndexCheckersMap.current[gp.index] = getUnknownGamepadChecker(gp);
+				if (gp.id.toLowerCase().startsWith('xbox')) gamepadIndexCheckersMap.current[gp.index] = gamepadCheckerXbox;
+				else gamepadIndexCheckersMap.current[gp.index] = gamepadCheckerUnknown;
 			});
 		};
 
@@ -79,10 +79,16 @@ const App = () => {
 	}, []);
 
 	if (lastUpdatedGamepad === null) return <div>no gamepad detected</div>;
+	const gp = navigator.getGamepads()[lastUpdatedGamepad.index];
+	if (gp === null) return <div>navigator gamepad error</div>;
 
 	return (
 		<div>
 			<div>{navigator.getGamepads()[lastUpdatedGamepad.index]?.id}</div>
+			{gamepadIndexCheckersMap.current[gp.index] === gamepadCheckerUnknown ? <div>GAMEPAD NOT SUPPORTED</div> : null}
+			<ul>
+				{Object.entries(gamepadIndexCheckersMap.current[lastUpdatedGamepad.index]).map(v => <li key={v[0]}>{v[0] + ':' + String(v[1](gp))}</li>)}
+			</ul>
 			<ul>
 				{lastUpdatedGamepad.axis.map((value, i) => <li key={i}>{`axis: ${i}: ${value}`}</li>)}
 				{lastUpdatedGamepad.buttons.map((value, i) => <li key={i}>{`button ${i}: ${value}`}</li>)}
