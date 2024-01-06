@@ -34,3 +34,18 @@ Small note: when pressing the d-pad on my 360 controller, the axis values change
 So, I have an idea for how to setup this so called wrapper class. Honestly it shouldn't be an entire class, but just an object. And what it contains is a mapping of final button values to interpretor functions for a gamepad index. The object itself will contain an index (correspending to a gamepad index from the api), and an array of button check functions. These functions will be designed to correctly interpret a specific value in the correspending gamepad. Most inputs are buttons, the function will be a simple check of the button value. But for others like axis, it'll check if that axis is beyond a threshold to determine if it returns true.
 
 Another note: triggers on xbox 360 controller are considered buttons, but return a float between 0 and 1.
+
+
+6th of January, 2024
+
+Just realized a flaw in my button plan. In cases where the d-pad triggers a different value on the same button, we can't check that value for diagonal directions. I have a new temporary plan, let's just disallow d-pad inputs that use the same button for all values. Instead we'll simply recognize button values as "pressed" if they are not 0. This means d-pads which give out mutliple values to the same button will be bugged, but I'm comfortable with that for now.
+
+Ugh, just realized the Playstation 4 controller activates a button and an axis value when pressing the triggers. Also apparently the PS4 d-pad is treated as an axis, not a button. 
+
+Gosh I seriously wonder if it actually would be better to hand code individual interpretations for each controller type.
+
+Perhaps given how weird so many of these are, we can just assume that a non-1 value means the input is "neutral". And when the input changes to anything other than whatever it started as, we consider it "activated". 
+
+Wait, here's an idea. Let's hard code button and axis interpretations for the gamepads we know, but do a best guestimate for unknown pads. For the guestimate, we'll simply ignore all axis and only consider buttons that have a default value of 0. Hopefully this will cover most bases.
+
+

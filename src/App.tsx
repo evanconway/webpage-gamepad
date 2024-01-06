@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { GamepadChecker, getUnknownGamepadChecker, getXboxGamepadChecker } from "./gamepad";
 
 interface GamepadState {
 	id: string,
@@ -20,6 +21,10 @@ const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
 };
 
 const App = () => {
+	// mapping of gamepad indexes to gamepad checkers
+	const gamepadIndexCheckersMap = useRef<Record<number, GamepadChecker>>({});
+
+	// stored states of each gamepad, updated each step
 	const gamepadStates = useRef<Record<string, GamepadState>>({});
 
 	const [lastUpdatedGamepad, setLastUpdatedGamepad] = useState<GamepadState | null>(null);
@@ -38,7 +43,6 @@ const App = () => {
 				return result;
 			}).forEach(gp => {
 				if (gp === null) return;
-				// known anti-pattern, review later
 				if (gamepadStates.current[gp.index] === undefined || !gamepadStateEqual(gamepadStates.current[gp.index], gp)) {
 					gamepadStates.current[gp.index] = gp;
 					indexToSetAsUpdatedGamepad = gp.index;
@@ -54,19 +58,23 @@ const App = () => {
 		requestAnimationFrame(step);
 
 		// setup gamepads
-		const onConnect = (e: GamepadEvent) => {
-			//const gp = e.gamepad;
-			//console.log('Gamepad connected at index %d: %s. %d buttons, %d axes.', gp.index, gp.id, gp.buttons.length, gp.axes.length);
+		const onConnect = () => {
 			console.log('gamepads connection updated');
+			gamepadIndexCheckersMap.current = {};
 			navigator.getGamepads().forEach(gp => {
-				if (gp !== undefined) console.log(gp?.id);
+				if (gp === null) return;
+				console.log(gp.id);
+				if (gp.id.toLowerCase().startsWith('xbox')) gamepadIndexCheckersMap.current[gp.index] = getXboxGamepadChecker(gp);
+				else gamepadIndexCheckersMap.current[gp.index] = getUnknownGamepadChecker(gp);
 			});
 		};
 
 		window.addEventListener('gamepadconnected', onConnect);
+		window.addEventListener('gamepaddisconnected', onConnect);
 
 		return () => {
 			window.removeEventListener('gamepadconnected', onConnect);
+			window.removeEventListener('gamepaddisconnected', onConnect);
 		};
 	}, []);
 
