@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArcadeStick } from "./models/controls";
-import { GAMEPAD_INPUTS, gamepadIsSupported, getApplicationGamepadInput } from "./models/gamepad";
+import { GAMEPAD_INPUTS, gamepadIsSupported, getApplicationGamepadInput, ArcadeStickInputMapping } from "./models/controls";
 
 interface RawGamepadState {
 	id: string,
@@ -27,14 +26,17 @@ const App = () => {
 
 	const [lastUpdatedGamepadRawState, setLastUpdatedGamepadRawState] = useState<RawGamepadState | null>(null);
 
-	const [arcadeStick, setArcadeStick] = useState<ArcadeStick>({
-		direction: 0,
-		punch1: false,
-		punch2: false,
-		punch3: false,
-		kick1: false,
-		kick2: false,
-		kick3: false,
+	const [arcadeStickInputMapping, setArcadeStickInputMapping] = useState<ArcadeStickInputMapping>({
+		directionLeft: { gamepadIndex: 0, input: 'pad-left' },
+		directionRight: { gamepadIndex: 0, input: 'pad-right' },
+		directionUp: { gamepadIndex: 0, input: 'pad-up' },
+		directionDown: { gamepadIndex: 0, input: 'pad-down' },
+		punch1: { gamepadIndex: 0, input: 'face-2' },
+		punch2: { gamepadIndex: 0, input: 'face-3' },
+		punch3: { gamepadIndex: 0, input: 'bumper-right' },
+		kick1: { gamepadIndex: 0, input: 'face-0' },
+		kick2: { gamepadIndex: 0, input: 'face-1' },
+		kick3: { gamepadIndex: 0, input: 'trigger-right' },
 	});
 
 	useEffect(() => {
@@ -95,9 +97,23 @@ const App = () => {
 			<ul>
 				{GAMEPAD_INPUTS.map(input => <li key={input}>{input}: {getApplicationGamepadInput(gp, input) ? 'on' : 'off'}</li>)}
 			</ul>
+			<div>Raw Input</div>
 			<ul>
 				{lastUpdatedGamepadRawState.axis.map((value, i) => <li key={i}>{`axis: ${i}: ${value}`}</li>)}
 				{lastUpdatedGamepadRawState.buttons.map((value, i) => <li key={i}>{`button ${i}: ${value}`}</li>)}
+			</ul>
+			<div>Arcade Stick</div>
+			<ul>
+				<li key='up'>up: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.directionUp.gamepadIndex], arcadeStickInputMapping.directionUp.input) ? '+' : ''}</li>
+				<li key='down'>down: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.directionDown.gamepadIndex], arcadeStickInputMapping.directionDown.input) ? '+' : ''}</li>
+				<li key='left'>left: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.directionLeft.gamepadIndex], arcadeStickInputMapping.directionLeft.input) ? '+' : ''}</li>
+				<li key='right'>right: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.directionRight.gamepadIndex], arcadeStickInputMapping.directionRight.input) ? '+' : ''}</li>
+				<li key='p1'>punch 1: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.punch1.gamepadIndex], arcadeStickInputMapping.punch1.input) ? '+' : ''}</li>
+				<li key='p2'>punch 2: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.punch2.gamepadIndex], arcadeStickInputMapping.punch2.input) ? '+' : ''}</li>
+				<li key='p3'>punch 3: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.punch3.gamepadIndex], arcadeStickInputMapping.punch3.input) ? '+' : ''}</li>
+				<li key='k1'>kick 1: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.kick1.gamepadIndex], arcadeStickInputMapping.kick1.input) ? '+' : ''}</li>
+				<li key='k2'>kick 2: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.kick2.gamepadIndex], arcadeStickInputMapping.kick2.input) ? '+' : ''}</li>
+				<li key='k3'>kick 3: {getApplicationGamepadInput(navigator.getGamepads()[arcadeStickInputMapping.kick3.gamepadIndex], arcadeStickInputMapping.kick3.input) ? '+' : ''}</li>
 			</ul>
 		</div>
 	);
