@@ -48,4 +48,8 @@ Perhaps given how weird so many of these are, we can just assume that a non-1 va
 
 Wait, here's an idea. Let's hard code button and axis interpretations for the gamepads we know, but do a best guestimate for unknown pads. For the guestimate, we'll simply ignore all axis and only consider buttons that have a default value of 0. Hopefully this will cover most bases.
 
+The gamepad checker idea seems to work right. What we need now is a way to translate the gamepad checker into a more useable controls state. This will involve letting the user map controls. But for now let's hard code what buttons correspond to what game action. 
 
+We should think through exactly how this works. Firstly we keep track of raw state of the gamepads. This is the values given to us directly from the api. Secondly we'll translate those complex values, which could be axis values, into simple on/off values in the form of an application gamepad. This is the supported stuff like xbox, ps4, and whatever. Finally, we'll map an input from one of the connected gamepads to each arcade button. I suppose the way I'm thinking through this, it'll totally be possible to create mappings with two different gamepads. But I'm not worried about that yet. 
+
+Wait, instead of creating a mapping between raw gamepads and application gamepads, we should just setup functions that automatically get more knowable values from raw gamepads. There's no reason to manually store new functions and objects each time.

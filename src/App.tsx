@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { GamepadChecker, gamepadCheckerUnknown, gamepadCheckerXbox } from "./gamepad";
+import { ArcadeStick } from "./models/controls";
+import { GAMEPAD_INPUTS, gamepadIsSupported, getApplicationGamepadInput } from "./models/gamepad";
 
-interface GamepadState {
+interface RawGamepadState {
 	id: string,
 	index: number,
 	axis: readonly number[],
 	buttons: number[],
 }
 
-const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
+const rawGamepadStatesEqual = (a: RawGamepadState, b: RawGamepadState) => {
 	if (a.axis.length !== b.axis.length) return false;
 	for (let i = 0; i < a.axis.length; i++) {
 		if (a.axis[i] !== b.axis[i]) return false;
@@ -21,20 +22,27 @@ const gamepadStateEqual = (a: GamepadState, b: GamepadState) => {
 };
 
 const App = () => {
-	// mapping of gamepad indexes to gamepad checkers
-	const gamepadIndexCheckersMap = useRef<Record<number, GamepadChecker>>({});
-
 	// stored states of each gamepad, updated each step
-	const gamepadStates = useRef<Record<string, GamepadState>>({});
+	const rawGamepadStates = useRef<Record<string, RawGamepadState>>({});
 
-	const [lastUpdatedGamepad, setLastUpdatedGamepad] = useState<GamepadState | null>(null);
+	const [lastUpdatedGamepadRawState, setLastUpdatedGamepadRawState] = useState<RawGamepadState | null>(null);
+
+	const [arcadeStick, setArcadeStick] = useState<ArcadeStick>({
+		direction: 0,
+		punch1: false,
+		punch2: false,
+		punch3: false,
+		kick1: false,
+		kick2: false,
+		kick3: false,
+	});
 
 	useEffect(() => {
 		const step = () => {
 			let indexToSetAsUpdatedGamepad: number | null = null;
 			navigator.getGamepads().map((gp, i) => {
 				if (gp === null) return null;
-				const result: GamepadState = {
+				const result: RawGamepadState = {
 					id: gp.id,
 					index: i,
 					axis: gp.axes,
@@ -43,14 +51,16 @@ const App = () => {
 				return result;
 			}).forEach(gp => {
 				if (gp === null) return;
-				if (gamepadStates.current[gp.index] === undefined || !gamepadStateEqual(gamepadStates.current[gp.index], gp)) {
-					gamepadStates.current[gp.index] = gp;
+				if (rawGamepadStates.current[gp.index] === undefined || !rawGamepadStatesEqual(rawGamepadStates.current[gp.index], gp)) {
+					rawGamepadStates.current[gp.index] = gp;
 					indexToSetAsUpdatedGamepad = gp.index;
 					return;
 				}
 			});
 
-			if (indexToSetAsUpdatedGamepad !== null) setLastUpdatedGamepad(gamepadStates.current[indexToSetAsUpdatedGamepad]);
+			if (indexToSetAsUpdatedGamepad !== null) setLastUpdatedGamepadRawState(rawGamepadStates.current[indexToSetAsUpdatedGamepad]);
+
+
 
 			requestAnimationFrame(step);
 		};
@@ -60,12 +70,8 @@ const App = () => {
 		// setup gamepads
 		const onConnect = () => {
 			console.log('gamepads connection updated');
-			gamepadIndexCheckersMap.current = {};
 			navigator.getGamepads().forEach(gp => {
-				if (gp === null) return;
-				console.log(gp.id);
-				if (gp.id.toLowerCase().startsWith('xbox')) gamepadIndexCheckersMap.current[gp.index] = gamepadCheckerXbox;
-				else gamepadIndexCheckersMap.current[gp.index] = gamepadCheckerUnknown;
+				if (gp !== null) console.log(gp.id);
 			});
 		};
 
@@ -78,21 +84,21 @@ const App = () => {
 		};
 	}, []);
 
-	if (lastUpdatedGamepad === null) return <div>no gamepad detected</div>;
-	const gp = navigator.getGamepads()[lastUpdatedGamepad.index];
+	if (lastUpdatedGamepadRawState === null) return <div>no gamepad detected</div>;
+	const gp = navigator.getGamepads()[lastUpdatedGamepadRawState.index];
 	if (gp === null) return <div>navigator gamepad error</div>;
 
 	return (
 		<div>
-			<div>{navigator.getGamepads()[lastUpdatedGamepad.index]?.id}</div>
-			{gamepadIndexCheckersMap.current[gp.index] === gamepadCheckerUnknown ? <div>GAMEPAD NOT SUPPORTED</div> : null}
+			<div>{navigator.getGamepads()[lastUpdatedGamepadRawState.index]?.id}</div>
+			{gamepadIsSupported(gp) ? null : <div>GAMEPAD NOT SUPPORTED</div>}
 			<ul>
-				{Object.entries(gamepadIndexCheckersMap.current[lastUpdatedGamepad.index]).map(v => <li key={v[0]}>{v[0] + ':' + String(v[1](gp))}</li>)}
+				{GAMEPAD_INPUTS.map(input => <li key={input}>{input}: {getApplicationGamepadInput(gp, input) ? 'on' : 'off'}</li>)}
 			</ul>
 			<ul>
-				{lastUpdatedGamepad.axis.map((value, i) => <li key={i}>{`axis: ${i}: ${value}`}</li>)}
-				{lastUpdatedGamepad.buttons.map((value, i) => <li key={i}>{`button ${i}: ${value}`}</li>)}
-			</ul>;
+				{lastUpdatedGamepadRawState.axis.map((value, i) => <li key={i}>{`axis: ${i}: ${value}`}</li>)}
+				{lastUpdatedGamepadRawState.buttons.map((value, i) => <li key={i}>{`button ${i}: ${value}`}</li>)}
+			</ul>
 		</div>
 	);
 }
