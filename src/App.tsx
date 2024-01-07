@@ -22,11 +22,11 @@ const rawGamepadStatesEqual = (a: RawGamepadState, b: RawGamepadState) => {
 
 const App = () => {
 	// stored states of each gamepad, updated each step
-	const rawGamepadStates = useRef<Record<string, RawGamepadState>>({});
-	const rawKeyboardState = useRef<Record<string, boolean>>({});
+	const rawGamepadStatesRef = useRef<Record<string, RawGamepadState>>({});
+	const rawKeyboardStateRef = useRef<Record<string, boolean>>({});
 
 	const [lastUpdatedGamepadRawState, setLastUpdatedGamepadRawState] = useState<RawGamepadState | null>(null);
-
+	const [keyboardRawState, setKeyboardRawState] = useState<Record<string, boolean>>({});
 
 	const [arcadeStickGamepadInputMapping, setArcadeStickGamepadInputMapping] = useState<ArcadeStickGamepadInputMapping>({
 		gamepadIndex: 0,
@@ -57,8 +57,11 @@ const App = () => {
 
 	const [useKeyboard, setUseKeyboard] = useState(true);
 
+
+
 	useEffect(() => {
 		const step = () => {
+			// determine gamepad input state
 			let indexToSetAsUpdatedGamepad: number | null = null;
 			navigator.getGamepads().map((gp, i) => {
 				if (gp === null) return null;
@@ -71,19 +74,16 @@ const App = () => {
 				return result;
 			}).forEach(gp => {
 				if (gp === null) return;
-				if (rawGamepadStates.current[gp.index] === undefined || !rawGamepadStatesEqual(rawGamepadStates.current[gp.index], gp)) {
-					rawGamepadStates.current[gp.index] = gp;
+				if (rawGamepadStatesRef.current[gp.index] === undefined || !rawGamepadStatesEqual(rawGamepadStatesRef.current[gp.index], gp)) {
+					rawGamepadStatesRef.current[gp.index] = gp;
 					indexToSetAsUpdatedGamepad = gp.index;
 					return;
 				}
 			});
-
 			if (indexToSetAsUpdatedGamepad !== null) {
-				setLastUpdatedGamepadRawState(rawGamepadStates.current[indexToSetAsUpdatedGamepad]);
+				setLastUpdatedGamepadRawState(rawGamepadStatesRef.current[indexToSetAsUpdatedGamepad]);
 				setUseKeyboard(false);
 			}
-
-
 
 			requestAnimationFrame(step);
 		};
@@ -92,12 +92,14 @@ const App = () => {
 
 		// setup keyboard listener
 		const onKeyDown = (e: KeyboardEvent) => {
+			rawKeyboardStateRef.current[e.key] = true;
+			setKeyboardRawState({...rawKeyboardStateRef.current});
 			setUseKeyboard(true);
-			rawKeyboardState.current[e.key] = true;
 		};
 		const onKeyUp = (e: KeyboardEvent) => {
+			rawKeyboardStateRef.current[e.key] = false;
+			setKeyboardRawState({...rawKeyboardStateRef.current});
 			setUseKeyboard(true);
-			rawKeyboardState.current[e.key] = false;
 		};
 		window.addEventListener('keydown', onKeyDown);
 		window.addEventListener('keyup', onKeyUp);
@@ -141,7 +143,7 @@ const App = () => {
 			</ul>
 			<div>Arcade Stick</div>
 			{ useKeyboard ? <ul>
-				
+				{Object.entries(keyboardRawState).map(v => <li key={v[0]}>{v[0]}: {v[1] ? '+' : ''}</li>)}
 			</ul> : <ul>
 				<li key='up'>up: {getApplicationGamepadInput(arcadeStickMappedGamepad, arcadeStickGamepadInputMapping.directionUp) ? '+' : ''}</li>
 				<li key='down'>down: {getApplicationGamepadInput(arcadeStickMappedGamepad, arcadeStickGamepadInputMapping.directionDown) ? '+' : ''}</li>
