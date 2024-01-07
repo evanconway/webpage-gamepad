@@ -55,3 +55,5 @@ We should think through exactly how this works. Firstly we keep track of raw sta
 Wait, instead of creating a mapping between raw gamepads and application gamepads, we should just setup functions that automatically get more knowable values from raw gamepads. There's no reason to manually store new functions and objects each time.
 
 Ok now that we have raw gamestates and a more intuitive way of polling them, we can map raw gamepad input to arcade stick input. Again, we'll map a gamepad index and an input to each arcade stick input. For now let's hard wire gamepad 0 and some intuitive inputs to the arcade stick, assume xbox controller. We'll figure out how to handle remapping later.
+
+Trying to add keyboard input as well. Allowing multiple gamepads mapped to the 1 arcade stick feels wrong. Not sure how to organize it otherwise though. I suppose we could just let the user set a gamepad index when binding inputs? Maybe this index just gets set to whatever the index of the last used controller is. 

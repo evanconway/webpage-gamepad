@@ -120,20 +120,29 @@ export const getApplicationGamepadInput = (gp: Gamepad | null, input: Applicatio
     return false;
 };
 
-interface ArcadeStickSingleInputMapping {
+export interface ArcadeStickGamepadInputMapping {
     gamepadIndex: 0 | 1 | 2 | 3,
-    input: ApplicationGamepadInput,
+    directionLeft: ApplicationGamepadInput,
+    directionRight: ApplicationGamepadInput,
+    directionUp: ApplicationGamepadInput,
+    directionDown: ApplicationGamepadInput,
+    punch1: ApplicationGamepadInput,
+    punch2: ApplicationGamepadInput,
+    punch3: ApplicationGamepadInput,
+    kick1: ApplicationGamepadInput,
+    kick2: ApplicationGamepadInput,
+    kick3: ApplicationGamepadInput,
 }
 
-export interface ArcadeStickInputMapping {
-    directionLeft: ArcadeStickSingleInputMapping,
-    directionRight: ArcadeStickSingleInputMapping,
-    directionUp: ArcadeStickSingleInputMapping,
-    directionDown: ArcadeStickSingleInputMapping,
-    punch1: ArcadeStickSingleInputMapping,
-    punch2: ArcadeStickSingleInputMapping,
-    punch3: ArcadeStickSingleInputMapping,
-    kick1: ArcadeStickSingleInputMapping,
-    kick2: ArcadeStickSingleInputMapping,
-    kick3: ArcadeStickSingleInputMapping,
+export interface ArcadeStickKeyboardInputMapping {
+    directionLeft: string,
+    directionRight: string,
+    directionUp: string,
+    directionDown: string,
+    punch1: string,
+    punch2: string,
+    punch3: string,
+    kick1: string,
+    kick2: string,
+    kick3: string,
 }
