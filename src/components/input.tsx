@@ -1,21 +1,26 @@
 import { useEffect } from "react";
 import { setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
+import { useDispatch } from "react-redux";
 
 const Input = () => {
+    console.log('rendering Input component');
+    const dispatch = useDispatch();
+
     useEffect(() => {
+        console.log('starting request animation frame loop');
         // need to figure out how to correctly use dispatch inside this hook, and cancel the old requestion animation loop.
 
         // setup input loop
         const step = () => {
-            setGamepadArray(navigator.getGamepads()); // this may trigger too many rerenders, mess with later
+            dispatch(setGamepadArray(navigator.getGamepads())); // this may trigger too many rerenders, mess with later
             requestAnimationFrame(step);
         };
         requestAnimationFrame(step);
 
         // gamepad connections
         const onConnect = () => {
-            setGamepadArray(navigator.getGamepads());
+            dispatch(setGamepadArray(navigator.getGamepads()));
         };
 
         window.addEventListener('gamepadconnected', onConnect);
@@ -23,10 +28,10 @@ const Input = () => {
 
         // keyboard
         const keyDown = (e: KeyboardEvent) => {
-            setKeyboardKey({ key: e.key, down: true });
+            dispatch(setKeyboardKey({ key: e.key, down: true }));
         };
         const keyUp = (e: KeyboardEvent) => {
-            setKeyboardKey({ key: e.key, down: false });
+            dispatch(setKeyboardKey({ key: e.key, down: false }));
         };
         window.addEventListener('keydown', keyDown);
         window.addEventListener('keyup', keyUp);
@@ -37,7 +42,7 @@ const Input = () => {
             window.removeEventListener('keydown', keyDown);
             window.removeEventListener('keyup', keyUp);
         };
-    }, []);
+    }, [dispatch]);
 
     return null;
 };
