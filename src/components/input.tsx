@@ -9,14 +9,15 @@ const Input = () => {
 
     useEffect(() => {
         console.log('starting request animation frame loop');
+        let requestAnimationFrameID = 0;
         // need to figure out how to correctly use dispatch inside this hook, and cancel the old requestion animation loop.
 
         // setup input loop
         const step = () => {
             dispatch(setGamepadArray(navigator.getGamepads())); // this may trigger too many rerenders, mess with later
-            requestAnimationFrame(step);
+            requestAnimationFrameID = requestAnimationFrame(step);
         };
-        requestAnimationFrame(step);
+        requestAnimationFrameID = requestAnimationFrame(step);
 
         // gamepad connections
         const onConnect = () => {
@@ -36,11 +37,16 @@ const Input = () => {
         window.addEventListener('keydown', keyDown);
         window.addEventListener('keyup', keyUp);
 
+        console.log('listeners added')
+
         return () => {
             window.removeEventListener('gamepadconnected', onConnect);
             window.removeEventListener('gamepaddisconnected', onConnect);
             window.removeEventListener('keydown', keyDown);
             window.removeEventListener('keyup', keyUp);
+            console.log('ending animation frame loop');
+            cancelAnimationFrame(requestAnimationFrameID);
+            console.log('listeners removed');
         };
     }, [dispatch]);
 
