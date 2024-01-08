@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { setGamepadArray } from "../state/gamepadSlice";
+import { setKeyboardKey } from "../state/keyboardSlice";
 
 const Input = () => {
     useEffect(() => {
@@ -18,9 +19,21 @@ const Input = () => {
         window.addEventListener('gamepadconnected', onConnect);
         window.addEventListener('gamepaddisconnected', onConnect);
 
+        // keyboard
+        const keyDown = (e: KeyboardEvent) => {
+            setKeyboardKey({ key: e.key, down: true });
+        };
+        const keyUp = (e: KeyboardEvent) => {
+            setKeyboardKey({ key: e.key, down: false });
+        };
+        window.addEventListener('keydown', keyDown);
+        window.addEventListener('keyup', keyUp);
+
         return () => {
             window.removeEventListener('gamepadconnected', onConnect);
             window.removeEventListener('gamepaddisconnected', onConnect);
+            window.removeEventListener('keydown', keyDown);
+            window.removeEventListener('keyup', keyUp);
         };
     }, []);
 

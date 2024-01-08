@@ -11,7 +11,7 @@ interface ApplicationGamepad {
 const initialState: (ApplicationGamepad | null)[] = [];
 
 export const gamepadSlice = createSlice({
-    name: 'arcadeStick',
+    name: 'gamepads',
     initialState,
     reducers: {
         setGamepadArray: (state, action: PayloadAction<(Gamepad | null)[]>) => {
