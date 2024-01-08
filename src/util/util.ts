@@ -1,4 +1,5 @@
-import { ApplicationGamepad, ApplicationGamepads } from "../state/gamepadSlice";
+import { ApplicationGamepad } from "../models/controls";
+import { ApplicationGamepads } from "../state/gamepadSlice";
 
 const gamepadsToApplicationGamepads = (gamepads: (Gamepad | null)[]): ApplicationGamepads => gamepads.map(gp => {
     if (gp === null) return null;
