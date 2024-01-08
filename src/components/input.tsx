@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { ApplicationGamepads, setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "../state/hooks";
 import { applicationGamepadsEqual, getApplicationGamepads } from "../util/util";
 import { setUseKeyboard } from "../state/userSlice";
 
 const Input = () => {
-    const dispatch = useDispatch();
+    const dispatch = useAppDispatch();
     const rawApplicationGamepadStates = useRef<ApplicationGamepads>(getApplicationGamepads());
 
     useEffect(() => {
