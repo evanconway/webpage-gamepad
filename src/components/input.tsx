@@ -4,6 +4,8 @@ import { setKeyboardKey } from "../state/keyboardSlice";
 
 const Input = () => {
     useEffect(() => {
+        // need to figure out how to correctly use dispatch inside this hook, and cancel the old requestion animation loop.
+
         // setup input loop
         const step = () => {
             setGamepadArray(navigator.getGamepads()); // this may trigger too many rerenders, mess with later

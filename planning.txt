@@ -64,3 +64,5 @@ Trying to add keyboard input as well. Allowing multiple gamepads mapped to the 1
 We added redux to the app. I think next we should move relavent input state into redux, and create an "input" component which will exist at the top level of the app, and will set input state for all other components to use.
 
 Just realized I should clarify how I plan on storing input data. We'll have a slice for raw controller data from the gamepad API. This will basically be a 1-to-1 mapping from the api to the slice. We'll also store raw keyboard input. We'll also store if the user is using keyboard or gamepad. Finally we'll store mappings between gamepad and keyboard to the arcade stick. Lastly we'll have multi-slice selectors that infer the arcade stick position based on the explained raw input data and mappings. 
+
+Just realized that I'm not sure how to use redux dispatch inside of the request animation frame loop. The useDispatch value is a hook. And our useEffect will need to rerun anytime the useDispatch value changes. I suppose that by itself isn't a problem, but I have no idea how to cancel the old request animation loop.
