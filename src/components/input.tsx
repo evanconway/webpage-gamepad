@@ -1,27 +1,29 @@
-import { useEffect } from "react";
-import { setGamepadArray } from "../state/gamepadSlice";
+import { useEffect, useRef } from "react";
+import { ApplicationGamepads, setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
 import { useDispatch } from "react-redux";
+import { applicationGamepadsEqual, getApplicationGamepads } from "../util/util";
 
 const Input = () => {
-    console.log('rendering Input component');
     const dispatch = useDispatch();
+    const rawApplicationGamepadStates = useRef<ApplicationGamepads>(getApplicationGamepads());
 
     useEffect(() => {
-        console.log('starting request animation frame loop');
-        let requestAnimationFrameID = 0;
-        // need to figure out how to correctly use dispatch inside this hook, and cancel the old requestion animation loop.
-
         // setup input loop
+        let requestAnimationFrameID = 0;
         const step = () => {
-            dispatch(setGamepadArray(navigator.getGamepads())); // this may trigger too many rerenders, mess with later
+            const newApplicationGamepadStates = getApplicationGamepads();
+            if (!applicationGamepadsEqual(rawApplicationGamepadStates.current, newApplicationGamepadStates)) {
+                rawApplicationGamepadStates.current = newApplicationGamepadStates;
+                dispatch(setGamepadArray(newApplicationGamepadStates));
+            }
             requestAnimationFrameID = requestAnimationFrame(step);
         };
         requestAnimationFrameID = requestAnimationFrame(step);
 
         // gamepad connections
         const onConnect = () => {
-            dispatch(setGamepadArray(navigator.getGamepads()));
+            dispatch(setGamepadArray(getApplicationGamepads()));
         };
 
         window.addEventListener('gamepadconnected', onConnect);
@@ -37,16 +39,12 @@ const Input = () => {
         window.addEventListener('keydown', keyDown);
         window.addEventListener('keyup', keyUp);
 
-        console.log('listeners added')
-
         return () => {
             window.removeEventListener('gamepadconnected', onConnect);
             window.removeEventListener('gamepaddisconnected', onConnect);
             window.removeEventListener('keydown', keyDown);
             window.removeEventListener('keyup', keyUp);
-            console.log('ending animation frame loop');
             cancelAnimationFrame(requestAnimationFrameID);
-            console.log('listeners removed');
         };
     }, [dispatch]);
 
