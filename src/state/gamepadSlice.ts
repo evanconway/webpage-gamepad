@@ -24,6 +24,7 @@ export const { setGamepadArray } = gamepadSlice.actions;
 export const selectGamepadByIndex = (state: RootState, index: number) => state.gamepads.gamepadArray[index];
 export const selectGamepadInput = (state: RootState, port: 0 | 1 | 2 | 3, input: ApplicationGamepadInput) => {
     const gp = state.gamepads.gamepadArray[port];
+    if (gp === undefined) return false;
     return getApplicationGamepadInput(gp, input);
 };
 

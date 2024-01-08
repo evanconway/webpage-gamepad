@@ -22,20 +22,20 @@ interface InitialState {
 
 const initialState: InitialState = {
     directionUp: {
-        port: 'keyboard',
-        input: 'w',
+        port: 0,
+        input: 'stick-left-up',
     },
     directionDown: {
-        port: 'keyboard',
-        input: 's',
+        port: 0,
+        input: 'stick-left-down',
     },
     directionLeft: {
-        port: 'keyboard',
-        input: 'a',
+        port: 0,
+        input: 'stick-left-left',
     },
     directionRight: {
-        port: 'keyboard',
-        input: 'd',
+        port: 0,
+        input: 'stick-left-right',
     },
     punch1: {
         port: 'keyboard',
