@@ -1,15 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import arcadeStick from './arcadeStickSlice';
 import gamepads from './gamepadSlice';
 import keyboard from './keyboardSlice';
 import user from './userSlice';
+import inputMapping from './inputMappingSlice';
 
 export const store = configureStore({
     reducer: {
-        arcadeStick,
         gamepads,
         keyboard,
         user,
+        inputMapping,
     },
 });
 

@@ -1,39 +1,49 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { ApplicationGamepadInput } from "../models/controls";
+import { selectGamepadInput } from "./gamepadSlice";
+import { ActionMapping } from "./inputMappingSlice";
+import { selectKeyboardKey } from "./keyboardSlice";
+import { RootState } from "./store";
 
-interface ArcadeStickState {
-    direction: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
-    punch1: boolean,
-    punch2: boolean,
-    punch3: boolean,
-    kick1: boolean,
-    kick2: boolean,
-    kick3: boolean,
-}
+/*
+The arcade stick state is not stored as actual state. Instead it is a concept whose state is inferred
+by the current gamepads/keyboard states and input to action mappings. We cannot "set" the state of the
+arcade stick. Only select it. We're putting these selectors in a file called a slice just for the sake
+of consistency.
+*/
 
-const initialState: ArcadeStickState = {
-    direction: 5,
-    punch1: false,
-    punch2: false,
-    punch3: false,
-    kick1: false,
-    kick2: false,
-    kick3: false,
+const getMappedInput = (state: RootState, mapping: ActionMapping | null) => {
+    return mapping === null ? false :
+        mapping.port === 'keyboard' ?
+            selectKeyboardKey(state, mapping.input)
+            :
+            selectGamepadInput(state, mapping.port, mapping.input as ApplicationGamepadInput);
 };
 
-export const arcadeStickSlice = createSlice({
-    name: 'arcadeStick',
-    initialState,
-    reducers: {
-        setArcadeStick: (state, action: PayloadAction<ArcadeStickState>) => {
-            state.direction = action.payload.direction;
-            state.punch1 = action.payload.punch1;
-            state.punch2 = action.payload.punch2;
-            state.punch3 = action.payload.punch3;
-            state.kick1 = action.payload.kick1;
-            state.kick2 = action.payload.kick2;
-            state.kick3 = action.payload.kick3;
-        },
-    },
-});
+export const selectArcadeStickDirection = (state: RootState) => {
+    const up = getMappedInput(state, state.inputMapping.directionUp);
+    const down = getMappedInput(state, state.inputMapping.directionDown);
+    const left = getMappedInput(state, state.inputMapping.directionLeft);
+    const right = getMappedInput(state, state.inputMapping.directionRight);
 
-export default arcadeStickSlice.reducer;
+    const vertical = (up ? -1 : 0) + (down ? 1 : 0);
+    const horizontal = (left ? -1 : 0) + (right ? 1 : 0);
+
+    // return numpad notation
+    if (vertical === 1 && horizontal === -1) return 1;
+    if (vertical === 1 && horizontal === 0) return 2;
+    if (vertical === 1 && horizontal === 1) return 3;
+    if (vertical === 0 && horizontal === -1) return 4;
+    if (vertical === 0 && horizontal === 0) return 5;
+    if (vertical === 0 && horizontal === 1) return 6;
+    if (vertical === -1 && horizontal === -1) return 7;
+    if (vertical === -1 && horizontal === 0) return 8;
+    if (vertical === -1 && horizontal === 1) return 9;
+    return 5;
+};
+
+export const selectArcadeStickPunch1 = (state: RootState) => getMappedInput(state, state.inputMapping.punch1);
+export const selectArcadeStickPunch2 = (state: RootState) => getMappedInput(state, state.inputMapping.punch2);
+export const selectArcadeStickPunch3 = (state: RootState) => getMappedInput(state, state.inputMapping.punch3);
+export const selectArcadeStickKick1 = (state: RootState) => getMappedInput(state, state.inputMapping.kick1);
+export const selectArcadeStickKick2 = (state: RootState) => getMappedInput(state, state.inputMapping.kick2);
+export const selectArcadeStickKick3 = (state: RootState) => getMappedInput(state, state.inputMapping.kick3);

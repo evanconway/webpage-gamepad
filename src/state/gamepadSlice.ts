@@ -1,12 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-
-export interface ApplicationGamepad {
-    buttons: number[],
-    axes: number[],
-    id: string,
-    index: number,
-}
+import { ApplicationGamepadInput, ApplicationGamepad, getApplicationGamepadInput } from "../models/controls";
 
 export type ApplicationGamepads = (ApplicationGamepad | null)[];
 
@@ -28,5 +22,9 @@ export const gamepadSlice = createSlice({
 
 export const { setGamepadArray } = gamepadSlice.actions;
 export const selectGamepadByIndex = (state: RootState, index: number) => state.gamepads.gamepadArray[index];
+export const selectGamepadInput = (state: RootState, port: 0 | 1 | 2 | 3, input: ApplicationGamepadInput) => {
+    const gp = state.gamepads.gamepadArray[port];
+    return getApplicationGamepadInput(gp, input);
+};
 
 export default gamepadSlice.reducer;
