@@ -3,6 +3,7 @@ import { ApplicationGamepads, setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
 import { useDispatch } from "react-redux";
 import { applicationGamepadsEqual, getApplicationGamepads } from "../util/util";
+import { setUseKeyboard } from "../state/userSlice";
 
 const Input = () => {
     const dispatch = useDispatch();
@@ -16,6 +17,7 @@ const Input = () => {
             if (!applicationGamepadsEqual(rawApplicationGamepadStates.current, newApplicationGamepadStates)) {
                 rawApplicationGamepadStates.current = newApplicationGamepadStates;
                 dispatch(setGamepadArray(newApplicationGamepadStates));
+                dispatch(setUseKeyboard(false));
             }
             requestAnimationFrameID = requestAnimationFrame(step);
         };
@@ -32,9 +34,11 @@ const Input = () => {
         // keyboard
         const keyDown = (e: KeyboardEvent) => {
             dispatch(setKeyboardKey({ key: e.key, down: true }));
+            dispatch(setUseKeyboard(true));
         };
         const keyUp = (e: KeyboardEvent) => {
             dispatch(setKeyboardKey({ key: e.key, down: false }));
+            dispatch(setUseKeyboard(true));
         };
         window.addEventListener('keydown', keyDown);
         window.addEventListener('keyup', keyUp);
