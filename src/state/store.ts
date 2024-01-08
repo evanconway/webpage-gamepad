@@ -1,9 +1,11 @@
-import { configureStore } from "@reduxjs/toolkit";
-import arcadeStickReducer from "./arcadeStickSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import arcadeStick from './arcadeStickSlice';
+import gamepads from './gamepadSlice';
 
 export const store = configureStore({
     reducer: {
-        arcadeStickReducer,
+        arcadeStick,
+        gamepads,
     },
 });
 

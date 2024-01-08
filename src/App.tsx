@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { GAMEPAD_INPUTS, gamepadIsSupported, getApplicationGamepadInput, ArcadeStickGamepadInputMapping, ArcadeStickKeyboardInputMapping } from "./models/controls";
+import Input from "./components/input";
 
 interface RawGamepadState {
 	id: string,
@@ -131,6 +132,7 @@ const App = () => {
 
 	return (
 		<div>
+			<Input/>
 			<div>{navigator.getGamepads()[lastUpdatedGamepadRawState.index]?.id}</div>
 			{gamepadIsSupported(gp) ? null : <div>GAMEPAD NOT SUPPORTED</div>}
 			<ul>
