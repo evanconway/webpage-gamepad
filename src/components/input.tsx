@@ -2,19 +2,19 @@ import { useEffect, useRef } from "react";
 import { ApplicationGamepads, setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
 import { useAppDispatch } from "../state/hooks";
-import { applicationGamepadsEqual, getApplicationGamepads } from "../util/util";
 import { setUseKeyboard } from "../state/userSlice";
+import { applicationGamepadArraysEqual, getApplicationGamepadsFromNavigatorGamepads } from "../models/controls";
 
 const Input = () => {
     const dispatch = useAppDispatch();
-    const rawApplicationGamepadStates = useRef<ApplicationGamepads>(getApplicationGamepads());
+    const rawApplicationGamepadStates = useRef<ApplicationGamepads>(getApplicationGamepadsFromNavigatorGamepads());
 
     useEffect(() => {
         // setup input loop
         let requestAnimationFrameID = 0;
         const step = () => {
-            const newApplicationGamepadStates = getApplicationGamepads();
-            if (!applicationGamepadsEqual(rawApplicationGamepadStates.current, newApplicationGamepadStates)) {
+            const newApplicationGamepadStates = getApplicationGamepadsFromNavigatorGamepads();
+            if (!applicationGamepadArraysEqual(rawApplicationGamepadStates.current, newApplicationGamepadStates)) {
                 rawApplicationGamepadStates.current = newApplicationGamepadStates;
                 dispatch(setGamepadArray(newApplicationGamepadStates));
                 dispatch(setUseKeyboard(false));
@@ -25,7 +25,7 @@ const Input = () => {
 
         // gamepad connections
         const onConnect = () => {
-            dispatch(setGamepadArray(getApplicationGamepads()));
+            dispatch(setGamepadArray(getApplicationGamepadsFromNavigatorGamepads()));
         };
 
         window.addEventListener('gamepadconnected', onConnect);

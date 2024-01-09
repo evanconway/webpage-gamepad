@@ -1,5 +1,4 @@
-import { ApplicationGamepadInput } from "../models/controls";
-import { selectGamepadInput } from "./gamepadSlice";
+import { selectGamepadByPort } from "./gamepadSlice";
 import { ActionMapping } from "./inputMappingSlice";
 import { selectKeyboardKey } from "./keyboardSlice";
 import { RootState } from "./store";
@@ -12,11 +11,25 @@ of consistency.
 */
 
 const getMappedInput = (state: RootState, mapping: ActionMapping | null) => {
-    return mapping === null ? false :
-        mapping.port === 'keyboard' ?
-            selectKeyboardKey(state, mapping.input)
-            :
-            selectGamepadInput(state, mapping.port, mapping.input as ApplicationGamepadInput);
+    if (mapping === null) return false;
+    if (mapping.port === 'keyboard') return selectKeyboardKey(state, mapping.input);
+    const gamepad = selectGamepadByPort(state, mapping.port);
+    if (gamepad === null) return false;
+    if (mapping.input === 'stick-left-left') return gamepad.stickLeftLeft;
+    if (mapping.input === 'stick-left-right') return gamepad.stickLeftRight;
+    if (mapping.input === 'stick-left-up') return gamepad.stickLeftUp;
+    if (mapping.input === 'stick-left-down') return gamepad.stickLeftDown;
+    if (mapping.input === 'stick-right-left') return gamepad.stickRightLeft;
+    if (mapping.input === 'stick-right-right') return gamepad.stickRightRight;
+    if (mapping.input === 'stick-right-up') return gamepad.stickRightUp;
+    if (mapping.input === 'stick-right-down') return gamepad.stickRightDown;
+    if (mapping.input === 'face-0') return gamepad.face0;
+    if (mapping.input === 'face-1') return gamepad.face1;
+    if (mapping.input === 'face-2') return gamepad.face2;
+    if (mapping.input === 'face-3') return gamepad.face3;
+    if (mapping.input === 'bumper-left') return gamepad.bumperLeft;
+    if (mapping.input === 'bumper-right') return gamepad.bumperRight;
+    return false;
 };
 
 export const selectArcadeStickDirection = (state: RootState) => {

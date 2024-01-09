@@ -1,6 +1,31 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { ApplicationGamepadInput } from "../models/controls";
+
+export type ApplicationGamepadInput = 
+    'stick-left-left' |
+    'stick-left-right' |
+    'stick-left-up' |
+    'stick-left-down' |
+    'stick-right-left' |
+    'stick-right-right' |
+    'stick-right-up' |
+    'stick-right-down' |
+    'face-0' |
+    'face-1' |
+    'face-2' |
+    'face-3' |
+    'bumper-left' |
+    'bumper-right' |
+    'trigger-left' |
+    'trigger-right' |
+    'select' |
+    'start' |
+    'stick-left-button' |
+    'stick-right-button' |
+    'pad-up' |
+    'pad-down' |
+    'pad-left' |
+    'pad-right';
 
 export interface ActionMapping {
     port: 0 | 1 | 2 | 3 | 'keyboard',
