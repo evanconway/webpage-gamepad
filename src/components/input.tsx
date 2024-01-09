@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 import { ApplicationGamepads, setGamepadArray } from "../state/gamepadSlice";
 import { setKeyboardKey } from "../state/keyboardSlice";
 import { useAppDispatch } from "../state/hooks";
-import { setUseKeyboard } from "../state/userSlice";
-import { applicationGamepadArraysEqual, getApplicationGamepadsFromNavigatorGamepads } from "../models/controls";
+import { applicationGamepadArraysEqual, getApplicationGamepadsFromNavigatorGamepads } from "../util/controls";
 
 const Input = () => {
     const dispatch = useAppDispatch();
@@ -17,7 +16,6 @@ const Input = () => {
             if (!applicationGamepadArraysEqual(rawApplicationGamepadStates.current, newApplicationGamepadStates)) {
                 rawApplicationGamepadStates.current = newApplicationGamepadStates;
                 dispatch(setGamepadArray(newApplicationGamepadStates));
-                dispatch(setUseKeyboard(false));
             }
             requestAnimationFrameID = requestAnimationFrame(step);
         };
@@ -34,11 +32,9 @@ const Input = () => {
         // keyboard
         const keyDown = (e: KeyboardEvent) => {
             dispatch(setKeyboardKey({ key: e.key, down: true }));
-            dispatch(setUseKeyboard(true));
         };
         const keyUp = (e: KeyboardEvent) => {
             dispatch(setKeyboardKey({ key: e.key, down: false }));
-            dispatch(setUseKeyboard(true));
         };
         window.addEventListener('keydown', keyDown);
         window.addEventListener('keyup', keyUp);
