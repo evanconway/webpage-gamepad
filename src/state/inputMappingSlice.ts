@@ -138,15 +138,6 @@ export const {
     setActionKick3,
 } = inputMappingSlice.actions;
 
-export const selectInputMappingDirectionUp = (state: RootState) => state.inputMapping.directionUp;
-export const selectInputMappingDirectionDown = (state: RootState) => state.inputMapping.directionDown;
-export const selectInputMappingDirectionLeft = (state: RootState) => state.inputMapping.directionLeft;
-export const selectInputMappingDirectionRight = (state: RootState) => state.inputMapping.directionRight;
-export const selectInputMappingPunch1 = (state: RootState) => state.inputMapping.punch1;
-export const selectInputMappingPunch2 = (state: RootState) => state.inputMapping.punch2;
-export const selectInputMappingPunch3 = (state: RootState) => state.inputMapping.punch3;
-export const selectInputMappingKick1 = (state: RootState) => state.inputMapping.kick1;
-export const selectInputMappingKick2 = (state: RootState) => state.inputMapping.kick2;
-export const selectInputMappingKick3 = (state: RootState) => state.inputMapping.kick3;
+export const selectInputMappings = (state: RootState) => state.inputMapping;
 
 export default inputMappingSlice.reducer;
