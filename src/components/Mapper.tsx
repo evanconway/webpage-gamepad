@@ -28,11 +28,11 @@ const Mapper = () => {
         kick3,
     } = useAppSelector(selectInputMappings);
 
-    return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)' }}>
+    return <div style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: '8px', rowGap: '4px' }}>
         {[
-            <div>Action</div>,
-            <div>Input</div>,
-            <div>Bind Action</div>,
+            <h3>Action</h3>,
+            <h3>Input</h3>,
+            <div></div>,
             ...getMappingRowElements('Left', directionLeft),
             ...getMappingRowElements('Right', directionRight),
             ...getMappingRowElements('Up', directionUp),
