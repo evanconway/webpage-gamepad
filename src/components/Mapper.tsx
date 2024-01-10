@@ -6,6 +6,14 @@ const mappingToString = (mapping: ActionMapping | null) => {
     return `${mapping.port === 'keyboard' ? 'Keyboard' : ('Gamepad ' + mapping.port)}: ${mapping.input.toUpperCase()}`;
 };
 
+const getMappingRowElements = (actionName: string, mapping: ActionMapping | null) => {
+    return [
+        <div>{actionName}</div>,
+        <div>{mappingToString(mapping)}</div>,
+        <button>Assign Input</button>,
+    ];
+};
+
 const Mapper = () => {
     const {
         directionLeft,
@@ -20,18 +28,23 @@ const Mapper = () => {
         kick3,
     } = useAppSelector(selectInputMappings);
 
-    return <ul>
-        <li>Left: {mappingToString(directionLeft)}</li>
-        <li>Right: {mappingToString(directionRight)}</li>
-        <li>Up: {mappingToString(directionUp)}</li>
-        <li>Down: {mappingToString(directionDown)}</li>
-        <li>Punch 1: {mappingToString(punch1)}</li>
-        <li>Punch 2: {mappingToString(punch2)}</li>
-        <li>Punch 3: {mappingToString(punch3)}</li>
-        <li>Kick 1: {mappingToString(kick1)}</li>
-        <li>Kick 2: {mappingToString(kick2)}</li>
-        <li>Kick 3: {mappingToString(kick3)}</li>
-    </ul>;
+    return <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto)' }}>
+        {[
+            <div>Action</div>,
+            <div>Input</div>,
+            <div>Bind Action</div>,
+            ...getMappingRowElements('Left', directionLeft),
+            ...getMappingRowElements('Right', directionRight),
+            ...getMappingRowElements('Up', directionUp),
+            ...getMappingRowElements('Down', directionDown),
+            ...getMappingRowElements('Punch 1', punch1),
+            ...getMappingRowElements('Punch 2', punch2),
+            ...getMappingRowElements('Punch 3', punch3),
+            ...getMappingRowElements('Kick 1', kick1),
+            ...getMappingRowElements('Kick 2', kick2),
+            ...getMappingRowElements('Kick 3', kick3),
+        ]}
+    </div>;
 };
 
 export default Mapper;
