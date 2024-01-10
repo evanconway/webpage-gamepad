@@ -1,5 +1,5 @@
 import { useAppSelector } from "../state/hooks";
-import { ActionMapping, selectInputMappings } from "../state/inputMappingSlice";
+import { ActionMapping, selectActionInputMappings } from "../state/actionInputMappingSlice";
 
 const mappingToString = (mapping: ActionMapping | null) => {
     if (mapping === null) return 'INPUT NOT MAPPED';
@@ -18,13 +18,13 @@ const Mapper = () => {
         kick1,
         kick2,
         kick3,
-    } = useAppSelector(selectInputMappings);
+    } = useAppSelector(selectActionInputMappings);
 
     const getMappingRowElements = (actionName: string, mapping: ActionMapping | null) => {
         return [
             <div key={actionName}>{actionName}</div>,
             <div key={actionName + '-mapping'}>{mappingToString(mapping)}</div>,
-            <button key={'assign-' + actionName} onClick={() => console.log('amazing')}>Assign Input</button>,
+            <button key={'assign-' + actionName} onClick={() => console.log('assign clicked')}>Assign Input</button>,
         ];
     };
 

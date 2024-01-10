@@ -88,8 +88,8 @@ const initialState: InitialState = {
     },
 }
 
-export const inputMappingSlice = createSlice({
-    name: 'input-mappings',
+export const actionInputMappingSlice = createSlice({
+    name: 'action-input-mappings',
     initialState,
     reducers: {
         setActionDirectionUp: (state, action: PayloadAction<ActionMapping>) => {
@@ -136,8 +136,8 @@ export const {
     setActionKick1,
     setActionKick2,
     setActionKick3,
-} = inputMappingSlice.actions;
+} = actionInputMappingSlice.actions;
 
-export const selectInputMappings = (state: RootState) => state.inputMapping;
+export const selectActionInputMappings = (state: RootState) => state.inputMapping;
 
-export default inputMappingSlice.reducer;
+export default actionInputMappingSlice.reducer;

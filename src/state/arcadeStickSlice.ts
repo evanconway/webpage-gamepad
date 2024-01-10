@@ -1,5 +1,5 @@
 import { selectGamepadByPort } from "./gamepadSlice";
-import { ActionMapping } from "./inputMappingSlice";
+import { ActionMapping } from "./actionInputMappingSlice";
 import { selectKeyboardKey } from "./keyboardSlice";
 import { RootState } from "./store";
 

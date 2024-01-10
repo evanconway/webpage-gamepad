@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 import gamepads from './gamepadSlice';
 import keyboard from './keyboardSlice';
-import inputMapping from './inputMappingSlice';
+import inputMapping from './actionInputMappingSlice';
 
 export const store = configureStore({
     reducer: {
