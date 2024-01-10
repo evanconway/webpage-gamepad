@@ -6,14 +6,6 @@ const mappingToString = (mapping: ActionMapping | null) => {
     return `${mapping.port === 'keyboard' ? 'Keyboard' : ('Gamepad ' + mapping.port)}: ${mapping.input.toUpperCase()}`;
 };
 
-const getMappingRowElements = (actionName: string, mapping: ActionMapping | null) => {
-    return [
-        <div>{actionName}</div>,
-        <div>{mappingToString(mapping)}</div>,
-        <button>Assign Input</button>,
-    ];
-};
-
 const Mapper = () => {
     const {
         directionLeft,
@@ -28,11 +20,19 @@ const Mapper = () => {
         kick3,
     } = useAppSelector(selectInputMappings);
 
+    const getMappingRowElements = (actionName: string, mapping: ActionMapping | null) => {
+        return [
+            <div key={actionName}>{actionName}</div>,
+            <div key={actionName + '-mapping'}>{mappingToString(mapping)}</div>,
+            <button key={'assign-' + actionName} onClick={() => console.log('amazing')}>Assign Input</button>,
+        ];
+    };
+
     return <div style={{ display: 'inline-grid', gridTemplateColumns: 'repeat(3, auto)', columnGap: '8px', rowGap: '4px' }}>
         {[
-            <h3>Action</h3>,
-            <h3>Input</h3>,
-            <div></div>,
+            <h3 key='action'>Action</h3>,
+            <h3 key='input'>Input</h3>,
+            <div key='blank'></div>,
             ...getMappingRowElements('Left', directionLeft),
             ...getMappingRowElements('Right', directionRight),
             ...getMappingRowElements('Up', directionUp),
