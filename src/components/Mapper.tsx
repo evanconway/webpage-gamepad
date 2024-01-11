@@ -10,6 +10,25 @@ const mappingToString = (mapping: ActionMapping | null) => {
     return `${mapping.port === 'keyboard' ? 'Keyboard' : ('Gamepad ' + mapping.port)}: ${mapping.input.toUpperCase()}`;
 };
 
+interface ActionMapper {
+    actionName: string,
+    mapActionFunction: (newMapping: ActionMapping) => void,
+    nextActionMapper: ActionMapper | null,
+}
+
+const ActionNames = {
+    up: 'Up',
+    down: 'Down',
+    left: 'Left',
+    right: 'Right',
+    punch1: 'Punch 1',
+    punch2: 'Punch 2',
+    punch3: 'Punch 3',
+    kick1: 'Kick 1',
+    kick2: 'Kick 2',
+    kick3: 'Kick 3',
+};
+
 const Mapper = () => {
     const dispatch = useAppDispatch();
 
@@ -19,7 +38,7 @@ const Mapper = () => {
     const keyboardRef = useRef(keyboard);
     const gamepadsRef = useRef(gamepads);
 
-    const [actionMapper, setActionMapper] = useState<{ actionName: string, mapActionFunction: (newMapping: ActionMapping) => void } | null>(null);
+    const [actionMapper, setActionMapper] = useState<ActionMapper | null>(null);
     const [mostRecentInput, setMostRecentInput] = useState<ActionMapping | null>(null);
 
     // detect input changes
@@ -29,7 +48,7 @@ const Mapper = () => {
         const act = (i: ActionMapping | null) => {
             setMostRecentInput(i);
             if (actionMapper !== null && i !== null) actionMapper?.mapActionFunction(i);
-            setActionMapper(null);
+            setActionMapper(actionMapper !== null ? actionMapper.nextActionMapper : null);
         };
 
         if (newKeyOn !== null) act({ input: newKeyOn, port: 'keyboard' });
@@ -37,7 +56,7 @@ const Mapper = () => {
 
         keyboardRef.current = keyboard;
         gamepadsRef.current = gamepads;
-    }, [keyboard, gamepads, actionMapper]);
+    }, [keyboard, gamepads, actionMapper, dispatch]);
 
     const {
         directionLeft,
@@ -58,7 +77,11 @@ const Mapper = () => {
             <div key={actionName + '-mapping'}>{actionMapper?.actionName === actionName ? 'AWAITING INPUT...' : mappingToString(actionMapping)}</div>,
             <button
                 key={'assign-' + actionName}
-                onClick={() => setActionMapper({ actionName, mapActionFunction: (newMapping) => dispatch(setActionSetter(newMapping)) })}
+                onClick={() => setActionMapper({
+                    actionName,
+                    mapActionFunction: (newMapping) => dispatch(setActionSetter(newMapping)),
+                    nextActionMapper : null
+                })}
                 disabled={actionMapper !== null}
             >Assign Input</button>,
         ];
@@ -70,17 +93,69 @@ const Mapper = () => {
             {[
                 <h3 key='action'>Action</h3>,
                 <h3 key='input'>Input</h3>,
-                <div key='blank'></div>,
-                ...getMappingRowElements('Left', directionLeft, setActionDirectionLeft),
-                ...getMappingRowElements('Right', directionRight, setActionDirectionRight),
-                ...getMappingRowElements('Up', directionUp, setActionDirectionUp),
-                ...getMappingRowElements('Down', directionDown, setActionDirectionDown),
-                ...getMappingRowElements('Punch 1', punch1, setActionPunch1),
-                ...getMappingRowElements('Punch 2', punch2, setActionPunch2),
-                ...getMappingRowElements('Punch 3', punch3, setActionPunch3),
-                ...getMappingRowElements('Kick 1', kick1, setActionKick1),
-                ...getMappingRowElements('Kick 2', kick2, setActionKick2),
-                ...getMappingRowElements('Kick 3', kick3, setActionKick3),
+                <button key='assign-all' onClick={() => {
+                    const actionMapperKick3: ActionMapper = {
+                        actionName: ActionNames.kick3,
+                        mapActionFunction: (newMapping) => dispatch(setActionKick3(newMapping)),
+                        nextActionMapper: null,
+                    };
+                    const actionMapperKick2: ActionMapper = {
+                        actionName: ActionNames.kick2,
+                        mapActionFunction: (newMapping) => dispatch(setActionKick2(newMapping)),
+                        nextActionMapper: actionMapperKick3,
+                    };
+                    const actionMapperKick1: ActionMapper = {
+                        actionName: ActionNames.kick1,
+                        mapActionFunction: (newMapping) => dispatch(setActionKick1(newMapping)),
+                        nextActionMapper: actionMapperKick2,
+                    };
+                    const actionMapperPunch3: ActionMapper = {
+                        actionName: ActionNames.punch3,
+                        mapActionFunction: (newMapping) => dispatch(setActionPunch3(newMapping)),
+                        nextActionMapper: actionMapperKick1,
+                    };
+                    const actionMapperPunch2: ActionMapper = {
+                        actionName: ActionNames.punch2,
+                        mapActionFunction: (newMapping) => dispatch(setActionPunch2(newMapping)),
+                        nextActionMapper: actionMapperPunch3,
+                    };
+                    const actionMapperPunch1: ActionMapper = {
+                        actionName: ActionNames.punch1,
+                        mapActionFunction: (newMapping) => dispatch(setActionPunch1(newMapping)),
+                        nextActionMapper: actionMapperPunch2,
+                    };
+                    const actionMapperDirectionRight: ActionMapper = {
+                        actionName: ActionNames.right,
+                        mapActionFunction: (newMapping) => dispatch(setActionDirectionRight(newMapping)),
+                        nextActionMapper: actionMapperPunch1,
+                    };
+                    const actionMapperDirectionLeft: ActionMapper = {
+                        actionName: ActionNames.left,
+                        mapActionFunction: (newMapping) => dispatch(setActionDirectionLeft(newMapping)),
+                        nextActionMapper: actionMapperDirectionRight,
+                    };
+                    const actionMapperDirectionDown: ActionMapper = {
+                        actionName: ActionNames.down,
+                        mapActionFunction: (newMapping) => dispatch(setActionDirectionDown(newMapping)),
+                        nextActionMapper: actionMapperDirectionLeft,
+                    };
+                    const actionMapperDirectionUp: ActionMapper = {
+                        actionName: ActionNames.up,
+                        mapActionFunction: (newMapping) => dispatch(setActionDirectionUp(newMapping)),
+                        nextActionMapper: actionMapperDirectionDown,
+                    };
+                    setActionMapper(actionMapperDirectionUp);
+                }}>Assign All</button>,
+                ...getMappingRowElements(ActionNames.up, directionUp, setActionDirectionUp),
+                ...getMappingRowElements(ActionNames.down, directionDown, setActionDirectionDown),
+                ...getMappingRowElements(ActionNames.left, directionLeft, setActionDirectionLeft),
+                ...getMappingRowElements(ActionNames.right, directionRight, setActionDirectionRight),
+                ...getMappingRowElements(ActionNames.punch1, punch1, setActionPunch1),
+                ...getMappingRowElements(ActionNames.punch2, punch2, setActionPunch2),
+                ...getMappingRowElements(ActionNames.punch3, punch3, setActionPunch3),
+                ...getMappingRowElements(ActionNames.kick1, kick1, setActionKick1),
+                ...getMappingRowElements(ActionNames.kick2, kick2, setActionKick2),
+                ...getMappingRowElements(ActionNames.kick3, kick3, setActionKick3),
             ]}
         </div>
     </div>;
