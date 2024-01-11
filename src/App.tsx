@@ -1,12 +1,14 @@
-import CrudeStickDisplay from "./components/CrudeStickDisplay";
-import Mapper from "./components/Mapper";
-import Input from "./components/Input";
+import CrudeStickDisplay from './components/CrudeStickDisplay';
+import Mapper from './components/Mapper';
+import Input from './components/Input';
+import History from './components/History';
 
 const App = () => (
 	<div>
 		<Input/>
 		<Mapper/>
 		<CrudeStickDisplay/>
+		<History/>
 	</div>
 );
 

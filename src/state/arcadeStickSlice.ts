@@ -70,3 +70,23 @@ export const selectArcadeStickPunch3 = (state: RootState) => getMappedInput(stat
 export const selectArcadeStickKick1 = (state: RootState) => getMappedInput(state, state.inputMapping.kick1);
 export const selectArcadeStickKick2 = (state: RootState) => getMappedInput(state, state.inputMapping.kick2);
 export const selectArcadeStickKick3 = (state: RootState) => getMappedInput(state, state.inputMapping.kick3);
+
+export interface ArcadeStickState {
+    direction: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+    punch1: boolean,
+    punch2: boolean,
+    punch3: boolean,
+    kick1: boolean,
+    kick2: boolean,
+    kick3: boolean,
+}
+
+export const selectArcadeStickState = (state: RootState): ArcadeStickState => ({
+    direction: selectArcadeStickDirection(state),
+    punch1: selectArcadeStickPunch1(state),
+    punch2: selectArcadeStickPunch2(state),
+    punch3: selectArcadeStickPunch3(state),
+    kick1: selectArcadeStickKick1(state),
+    kick2: selectArcadeStickKick2(state),
+    kick3: selectArcadeStickKick3(state),
+});
