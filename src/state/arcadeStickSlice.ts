@@ -81,12 +81,37 @@ export interface ArcadeStickState {
     kick3: boolean,
 }
 
-export const selectArcadeStickState = (state: RootState): ArcadeStickState => ({
-    direction: selectArcadeStickDirection(state),
-    punch1: selectArcadeStickPunch1(state),
-    punch2: selectArcadeStickPunch2(state),
-    punch3: selectArcadeStickPunch3(state),
-    kick1: selectArcadeStickKick1(state),
-    kick2: selectArcadeStickKick2(state),
-    kick3: selectArcadeStickKick3(state),
-});
+// for fun, we're going to try and memoize this selector ourselves
+const state: ArcadeStickState = {
+    direction: 5,
+    punch1: false,
+    punch2: false,
+    punch3: false,
+    kick1: false,
+    kick2: false,
+    kick3: false,
+};
+
+const memoizedArcadeStickState = { state };
+
+export const selectArcadeStickState = (state: RootState): ArcadeStickState => {
+    const newState: ArcadeStickState = {
+        direction: selectArcadeStickDirection(state),
+        punch1: selectArcadeStickPunch1(state),
+        punch2: selectArcadeStickPunch2(state),
+        punch3: selectArcadeStickPunch3(state),
+        kick1: selectArcadeStickKick1(state),
+        kick2: selectArcadeStickKick2(state),
+        kick3: selectArcadeStickKick3(state),
+    };
+    let updateState = false;
+    if (newState.direction != memoizedArcadeStickState.state.direction) updateState = true;
+    if (newState.punch1 != memoizedArcadeStickState.state.punch1) updateState = true;
+    if (newState.punch2 != memoizedArcadeStickState.state.punch2) updateState = true;
+    if (newState.punch3 != memoizedArcadeStickState.state.punch3) updateState = true;
+    if (newState.kick1 != memoizedArcadeStickState.state.kick1) updateState = true;
+    if (newState.kick2 != memoizedArcadeStickState.state.kick2) updateState = true;
+    if (newState.kick3 != memoizedArcadeStickState.state.kick3) updateState = true;
+    if (updateState) memoizedArcadeStickState.state = newState;
+    return memoizedArcadeStickState.state;
+};
