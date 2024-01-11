@@ -1,7 +1,7 @@
 import { useAppSelector } from "../state/hooks";
-import { ActionMapping, ActionMappingPort, ApplicationGamepadInput, selectActionInputMappings } from "../state/actionInputMappingSlice";
+import { ActionMapping, selectActionInputMappings } from "../state/actionInputMappingSlice";
 import { selectKeyboard } from "../state/keyboardSlice";
-import { ApplicationGamepads, selectGamepads } from "../state/gamepadSlice";
+import { selectGamepads } from "../state/gamepadSlice";
 import { useEffect, useRef, useState } from "react";
 import { getNewGamepadOn, getNewKeyboardOn } from "../util/controls";
 
@@ -17,15 +17,21 @@ const Mapper = () => {
     const keyboardRef = useRef(keyboard);
     const gamepadsRef = useRef(gamepads);
 
+    const [mapActionToInputFunction, setMapActionToInputFunction] = useState<(() => void) | null>(null);
     const [mostRecentInput, setMostRecentInput] = useState<ActionMapping | null>(null);
 
     // detect input changes
     useEffect(() => {
+        //if (mapActionToInputFunction === null) return;
         const newKeyOn = getNewKeyboardOn(keyboardRef.current, keyboard);
         const newGamepadOn = getNewGamepadOn(gamepadsRef.current, gamepads);
+        const act = (i: ActionMapping | null) => {
+            //mapActionToInputFunction();
+            setMostRecentInput(i);
+        };
 
-        if (newKeyOn !== null) setMostRecentInput({ input: newKeyOn, port: 'keyboard' });
-        else if (newGamepadOn !== null) setMostRecentInput(newGamepadOn);
+        if (newKeyOn !== null) act({ input: newKeyOn, port: 'keyboard' });
+        else if (newGamepadOn !== null) act(newGamepadOn);
 
         keyboardRef.current = keyboard;
         gamepadsRef.current = gamepads;
@@ -48,7 +54,7 @@ const Mapper = () => {
         return [
             <div key={actionName}>{actionName}</div>,
             <div key={actionName + '-mapping'}>{mappingToString(mapping)}</div>,
-            <button key={'assign-' + actionName} onClick={() => console.log('assign clicked')}>Assign Input</button>,
+            <button key={'assign-' + actionName} onClick={() => console.log('set mapper component to assigning state')}>Assign Input</button>,
         ];
     };
 
