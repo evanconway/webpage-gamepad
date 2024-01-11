@@ -29,6 +29,16 @@ const getMappedInput = (state: RootState, mapping: ActionMapping | null) => {
     if (mapping.input === 'face-3') return gamepad.face3;
     if (mapping.input === 'bumper-left') return gamepad.bumperLeft;
     if (mapping.input === 'bumper-right') return gamepad.bumperRight;
+    if (mapping.input === 'trigger-left') return gamepad.triggerLeft;
+    if (mapping.input === 'trigger-right') return gamepad.triggerRight;
+    if (mapping.input === 'select') return gamepad.select;
+    if (mapping.input === 'start') return gamepad.start;
+    if (mapping.input === 'stick-left-button') return gamepad.stickLeftButton;
+    if (mapping.input === 'stick-right-button') return gamepad.stickRightButton;
+    if (mapping.input === 'pad-up') return gamepad.padUp;
+    if (mapping.input === 'pad-down') return gamepad.padDown;
+    if (mapping.input === 'pad-left') return gamepad.padLeft;
+    if (mapping.input === 'pad-right') return gamepad.padRight;
     return false;
 };
 
