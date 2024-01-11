@@ -49,7 +49,6 @@ const Input = () => {
             cancelAnimationFrame(requestAnimationFrameID);
         };
     }, [dispatch]);
-
     
     const stickState = useAppSelector(selectArcadeStickState);
 

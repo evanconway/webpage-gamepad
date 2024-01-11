@@ -15,6 +15,9 @@ export const keyboardSlice = createSlice({
 
 export const { setKeyboardKey } = keyboardSlice.actions;
 export const selectKeyboard = (state: RootState) => state.keyboard;
-export const selectKeyboardKey = (state: RootState, key: string) => state.keyboard[key] as boolean;
+export const selectKeyboardKey = (state: RootState, key: string) => {
+    if (state.keyboard[key] !== undefined) return state.keyboard[key];
+    return false;
+};
 
 export default keyboardSlice.reducer;
