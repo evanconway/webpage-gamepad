@@ -46,6 +46,7 @@ export const gamepadSlice = createSlice({
 });
 
 export const { setGamepadArray } = gamepadSlice.actions;
+export const selectGamepads = (state: RootState) => state.gamepads.gamepadArray;
 export const selectGamepadByPort = (state: RootState, port: 0 | 1 | 2 | 3) => {
     const gp = state.gamepads.gamepadArray[port];
     return gp === undefined ? null : gp;

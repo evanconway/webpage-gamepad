@@ -1,4 +1,5 @@
-import { ApplicationGamepad } from "../state/gamepadSlice";
+import { ActionMapping, ActionMappingPort } from "../state/actionInputMappingSlice";
+import { ApplicationGamepad, ApplicationGamepads } from "../state/gamepadSlice";
 
 const AXIS_DEADZONE = 0.4;
 
@@ -91,4 +92,46 @@ export const getApplicationGamepadsFromNavigatorGamepads = () => {
 
         return result;
     });
+};
+
+export const getNewKeyboardOn = (keyboardOld: Record<string, boolean>, keyboardNew: Record<string, boolean>) => {
+    const keys = Object.keys(keyboardNew);
+    for (let i = 0; i < keys.length; i++) {
+        const key = keys[i];
+        const value = keyboardNew[key];
+        if (value === true && keyboardOld[key] !== true) return key;
+    }
+    return null;
+};
+
+export const getNewGamepadOn = (gamepadsOld: ApplicationGamepads, gamepadsNew: ApplicationGamepads): ActionMapping | null => {
+    for (let g = 0; g < gamepadsNew.length; g++) {
+        const gpOld = gamepadsOld[g];
+        const gpNew = gamepadsNew[g];
+        if (gpNew?.stickLeftLeft && ! gpOld?.stickLeftLeft) return { input: 'stick-left-left', port: g as ActionMappingPort };
+        if (gpNew?.stickLeftRight && ! gpOld?.stickLeftRight) return { input: 'stick-left-right', port: g as ActionMappingPort };
+        if (gpNew?.stickLeftUp && ! gpOld?.stickLeftUp) return { input: 'stick-left-up', port: g as ActionMappingPort };
+        if (gpNew?.stickLeftDown && ! gpOld?.stickLeftDown) return { input: 'stick-left-down', port: g as ActionMappingPort };
+        if (gpNew?.stickRightLeft && ! gpOld?.stickRightLeft) return { input: 'stick-right-left', port: g as ActionMappingPort };
+        if (gpNew?.stickRightRight && ! gpOld?.stickRightRight) return { input: 'stick-right-right', port: g as ActionMappingPort };
+        if (gpNew?.stickRightUp && ! gpOld?.stickRightUp) return { input: 'stick-right-up', port: g as ActionMappingPort };
+        if (gpNew?.stickRightDown && ! gpOld?.stickRightDown) return { input: 'stick-right-down', port: g as ActionMappingPort };
+        if (gpNew?.face0 && ! gpOld?.face0) return { input: 'face-0', port: g as ActionMappingPort };
+        if (gpNew?.face1 && ! gpOld?.face1) return { input: 'face-1', port: g as ActionMappingPort };
+        if (gpNew?.face2 && ! gpOld?.face2) return { input: 'face-2', port: g as ActionMappingPort };
+        if (gpNew?.face3 && ! gpOld?.face3) return { input: 'face-3', port: g as ActionMappingPort };
+        if (gpNew?.bumperLeft && ! gpOld?.bumperLeft) return { input: 'bumper-left', port: g as ActionMappingPort };
+        if (gpNew?.bumperRight && ! gpOld?.bumperRight) return { input: 'bumper-right', port: g as ActionMappingPort };
+        if (gpNew?.triggerLeft && ! gpOld?.triggerLeft) return { input: 'trigger-left', port: g as ActionMappingPort };
+        if (gpNew?.triggerRight && ! gpOld?.triggerRight) return { input: 'trigger-right', port: g as ActionMappingPort };
+        if (gpNew?.select && ! gpOld?.select) return { input: 'select', port: g as ActionMappingPort };
+        if (gpNew?.start && ! gpOld?.start) return { input: 'start', port: g as ActionMappingPort };
+        if (gpNew?.stickLeftButton && ! gpOld?.stickLeftButton) return { input: 'stick-left-button', port: g as ActionMappingPort };
+        if (gpNew?.stickRightButton && ! gpOld?.stickRightButton) return { input: 'stick-right-button', port: g as ActionMappingPort };
+        if (gpNew?.padUp && !gpOld?.padUp) return { input: 'pad-up', port: g as ActionMappingPort };
+        if (gpNew?.padDown && !gpOld?.padDown) return { input: 'pad-down', port: g as ActionMappingPort };
+        if (gpNew?.padLeft && !gpOld?.padLeft) return { input: 'pad-left', port: g as ActionMappingPort };
+        if (gpNew?.padRight && !gpOld?.padRight) return { input: 'pad-right', port: g as ActionMappingPort };
+    }
+    return null;
 };

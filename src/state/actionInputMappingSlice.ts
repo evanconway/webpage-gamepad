@@ -27,8 +27,10 @@ export type ApplicationGamepadInput =
     'pad-left' |
     'pad-right';
 
+export type ActionMappingPort = 0 | 1 | 2 | 3 | 'keyboard';
+
 export interface ActionMapping {
-    port: 0 | 1 | 2 | 3 | 'keyboard',
+    port: ActionMappingPort,
     input: ApplicationGamepadInput | string,
 }
 
