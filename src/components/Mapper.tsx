@@ -1,5 +1,5 @@
-import { useAppSelector } from "../state/hooks";
-import { ActionMapping, selectActionInputMappings } from "../state/actionInputMappingSlice";
+import { useAppDispatch, useAppSelector } from "../state/hooks";
+import { ActionMapping, selectActionInputMappings, setActionDirectionDown, setActionDirectionLeft, setActionDirectionRight, setActionDirectionUp, setActionKick1, setActionKick2, setActionKick3, setActionPunch1, setActionPunch2, setActionPunch3 } from "../state/actionInputMappingSlice";
 import { selectKeyboard } from "../state/keyboardSlice";
 import { selectGamepads } from "../state/gamepadSlice";
 import { useEffect, useRef, useState } from "react";
@@ -11,23 +11,25 @@ const mappingToString = (mapping: ActionMapping | null) => {
 };
 
 const Mapper = () => {
+    const dispatch = useAppDispatch();
+
     const keyboard = useAppSelector(selectKeyboard);
     const gamepads = useAppSelector(selectGamepads);
 
     const keyboardRef = useRef(keyboard);
     const gamepadsRef = useRef(gamepads);
 
-    const [mapActionToInputFunction, setMapActionToInputFunction] = useState<(() => void) | null>(null);
+    const [actionMapper, setActionMapper] = useState<{ actionName: string, mapActionFunction: (newMapping: ActionMapping) => void } | null>(null);
     const [mostRecentInput, setMostRecentInput] = useState<ActionMapping | null>(null);
 
     // detect input changes
     useEffect(() => {
-        //if (mapActionToInputFunction === null) return;
         const newKeyOn = getNewKeyboardOn(keyboardRef.current, keyboard);
         const newGamepadOn = getNewGamepadOn(gamepadsRef.current, gamepads);
         const act = (i: ActionMapping | null) => {
-            //mapActionToInputFunction();
             setMostRecentInput(i);
+            if (actionMapper !== null && i !== null) actionMapper?.mapActionFunction(i);
+            setActionMapper(null);
         };
 
         if (newKeyOn !== null) act({ input: newKeyOn, port: 'keyboard' });
@@ -35,7 +37,7 @@ const Mapper = () => {
 
         keyboardRef.current = keyboard;
         gamepadsRef.current = gamepads;
-    }, [keyboard, gamepads]);
+    }, [keyboard, gamepads, actionMapper]);
 
     const {
         directionLeft,
@@ -50,11 +52,15 @@ const Mapper = () => {
         kick3,
     } = useAppSelector(selectActionInputMappings);
 
-    const getMappingRowElements = (actionName: string, mapping: ActionMapping | null) => {
+    const getMappingRowElements = (actionName: string, actionMapping: ActionMapping | null, setActionSetter: Function) => {
         return [
             <div key={actionName}>{actionName}</div>,
-            <div key={actionName + '-mapping'}>{mappingToString(mapping)}</div>,
-            <button key={'assign-' + actionName} onClick={() => console.log('set mapper component to assigning state')}>Assign Input</button>,
+            <div key={actionName + '-mapping'}>{actionMapper?.actionName === actionName ? 'AWAITING INPUT...' : mappingToString(actionMapping)}</div>,
+            <button
+                key={'assign-' + actionName}
+                onClick={() => setActionMapper({ actionName, mapActionFunction: (newMapping) => dispatch(setActionSetter(newMapping)) })}
+                disabled={actionMapper !== null}
+            >Assign Input</button>,
         ];
     };
 
@@ -65,16 +71,16 @@ const Mapper = () => {
                 <h3 key='action'>Action</h3>,
                 <h3 key='input'>Input</h3>,
                 <div key='blank'></div>,
-                ...getMappingRowElements('Left', directionLeft),
-                ...getMappingRowElements('Right', directionRight),
-                ...getMappingRowElements('Up', directionUp),
-                ...getMappingRowElements('Down', directionDown),
-                ...getMappingRowElements('Punch 1', punch1),
-                ...getMappingRowElements('Punch 2', punch2),
-                ...getMappingRowElements('Punch 3', punch3),
-                ...getMappingRowElements('Kick 1', kick1),
-                ...getMappingRowElements('Kick 2', kick2),
-                ...getMappingRowElements('Kick 3', kick3),
+                ...getMappingRowElements('Left', directionLeft, setActionDirectionLeft),
+                ...getMappingRowElements('Right', directionRight, setActionDirectionRight),
+                ...getMappingRowElements('Up', directionUp, setActionDirectionUp),
+                ...getMappingRowElements('Down', directionDown, setActionDirectionDown),
+                ...getMappingRowElements('Punch 1', punch1, setActionPunch1),
+                ...getMappingRowElements('Punch 2', punch2, setActionPunch2),
+                ...getMappingRowElements('Punch 3', punch3, setActionPunch3),
+                ...getMappingRowElements('Kick 1', kick1, setActionKick1),
+                ...getMappingRowElements('Kick 2', kick2, setActionKick2),
+                ...getMappingRowElements('Kick 3', kick3, setActionKick3),
             ]}
         </div>
     </div>;
