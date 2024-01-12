@@ -41,16 +41,20 @@ const step = (direction: Direction, buttons?: Button | Button[]) => {
     return { direction, ...getButtons(buttons) };
 };
 
+const createMove = (...moves: ArcadeStickState[][]) => {
+    return moves;
+}
+
 // moves
 
-export const shoryukenLight: ArcadeStickState[][] = [
+export const shoryukenLight = createMove(
     [step(6), step(2), step(3, 'punch1')],
     [step(6), step(2), step(3), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3), step(3, 'punch1')],
-];
+);
 
-export const hadoukenLight: ArcadeStickState[][] =[
+export const hadoukenLight = createMove(
     [step(2), step(3), step(6, 'punch1')],
     [step(2), step(3), step(6), step(6, 'punch1')],
-];
+);
