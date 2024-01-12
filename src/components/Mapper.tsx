@@ -4,6 +4,7 @@ import { selectKeyboard } from "../state/keyboardSlice";
 import { selectGamepads } from "../state/gamepadSlice";
 import { useEffect, useRef, useState } from "react";
 import { getNewGamepadOn, getNewKeyboardOn } from "../util/controls";
+import { Dispatch } from "@reduxjs/toolkit";
 
 const mappingToString = (mapping: ActionMapping | null) => {
     if (mapping === null) return 'INPUT NOT MAPPED';
@@ -71,7 +72,7 @@ const Mapper = () => {
         kick3,
     } = useAppSelector(selectActionInputMappings);
 
-    const getMappingRowElements = (actionName: string, actionMapping: ActionMapping | null, setActionSetter: Function) => {
+    const getMappingRowElements = (actionName: string, actionMapping: ActionMapping | null, setActionSetter: (mapping: ActionMapping) => (dispatch: Dispatch) => void) => {
         return [
             <div key={actionName}>{actionName}</div>,
             <div key={actionName + '-mapping'}>{actionMapper?.actionName === actionName ? 'AWAITING INPUT...' : mappingToString(actionMapping)}</div>,

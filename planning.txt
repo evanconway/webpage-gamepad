@@ -110,3 +110,7 @@ Truthfully, I wonder if we can just hardcode different options for each input. L
 
 Actually what we can do is store moves as arcade stick histories. We'll just compare them and if they match, the move was valid. But we could store more than 1 history for each move, and compare all of them to see if it's valid.
 
+
+12th of January, 2024
+
+We have a system that correctly detects specific moves based on the input history. And we can program the moves to have variations or shortcuts. I have to admit I'm not completely sure what I want to do next. Let's rethink through what we want our end experience to be, then asses what's left.
