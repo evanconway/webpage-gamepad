@@ -43,7 +43,9 @@ const getMappedInput = (state: RootState, mapping: ActionMapping | null) => {
     return false;
 };
 
-export const selectArcadeStickDirection = (state: RootState) => {
+export type Direction = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+
+export const selectArcadeStickDirection = (state: RootState): Direction => {
     const up = getMappedInput(state, state.inputMapping.directionUp);
     const down = getMappedInput(state, state.inputMapping.directionDown);
     const left = getMappedInput(state, state.inputMapping.directionLeft);
@@ -73,7 +75,7 @@ export const selectArcadeStickKick2 = (state: RootState) => getMappedInput(state
 export const selectArcadeStickKick3 = (state: RootState) => getMappedInput(state, state.inputMapping.kick3);
 
 export interface ArcadeStickState {
-    direction: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+    direction: Direction,
     punch1: boolean,
     punch2: boolean,
     punch3: boolean,
