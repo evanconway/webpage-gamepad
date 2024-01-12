@@ -85,3 +85,28 @@ We did some rewriting of state so things are clearer. And we have a proper displ
 So when the user clicks the assign button, we need to set this component to a state where it's listening for the next input. And once that input is detected, the mapping set function set for that button is invoked on the new input.
 
 I'm realizing since the rest of the app will have activity based on the users input, we may have to set the app up so the other logic is ignored while the user is mapping inputs. But for now we'll just let the mapper keep track of its own state.
+
+
+11th of January, 2024
+
+We've got a proper input history now. I think our next step should be making code which can determine if history is equal to certain moves. If we could be ultra precise with inputs, this would be easy. But we want to allow for multiple histories to be valid for the same input. For example. The shoryuken motion should be valid given any of the following histories:
+
+6
+2
+3p
+
+6
+5
+2
+3
+5p
+
+6
+5
+2
+3p
+
+Truthfully, I wonder if we can just hardcode different options for each input. Let's just try that first and see what happens.
+
+Actually what we can do is store moves as arcade stick histories. We'll just compare them and if they match, the move was valid. But we could store more than 1 history for each move, and compare all of them to see if it's valid.
+
