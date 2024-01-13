@@ -114,3 +114,7 @@ Actually what we can do is store moves as arcade stick histories. We'll just com
 12th of January, 2024
 
 We have a system that correctly detects specific moves based on the input history. And we can program the moves to have variations or shortcuts. I have to admit I'm not completely sure what I want to do next. Let's rethink through what we want our end experience to be, then asses what's left.
+
+We added left/right and light/medium/heavy versions of our 2 moves. But I'm unsure this was the right way to do it. I think perhaps manually writing out the light/medium/heavy versions makes sense, because we may want to program moves that are more complex than just a motion and button and the individual buttons matter (like Akuma's super). However I think perhaps we should make a move checker function that accounts for left/right mirroring of the move. That way we can easily add a setting like "allow mirrors" in the app, which uses either checking function when checking a move. And we could also add a up/down inversion checker with the same logic. 
+
+Actually, after looking over our logic, I bet we can modify our arcadeStickStateEqual function to account for left right and/or up down mirroring. Let's do that and see how it turns out.

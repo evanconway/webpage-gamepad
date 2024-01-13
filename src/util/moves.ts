@@ -1,7 +1,31 @@
 import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 
-const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
-    if (a.direction !== b.direction) return false;
+type Inversion = 'vertical' | 'horizontal' | 'vertical&horizontal';
+
+const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState, inversion?: Inversion) => {
+    if (a.direction === 5 && b.direction !== 5) return false;
+    else if (inversion === 'horizontal') {
+        if (a.direction === 1 && b.direction !== 3) return false;
+        if (a.direction === 3 && b.direction !== 1) return false;
+        if (a.direction === 4 && b.direction !== 6) return false;
+        if (a.direction === 6 && b.direction !== 4) return false;
+        if (a.direction === 7 && b.direction !== 9) return false;
+        if (a.direction === 9 && b.direction !== 7) return false;
+    } else if (inversion === 'vertical') {
+        if (a.direction === 1 && b.direction !== 7) return false;
+        if (a.direction === 7 && b.direction !== 1) return false;
+        if (a.direction === 2 && b.direction !== 8) return false;
+        if (a.direction === 8 && b.direction !== 2) return false;
+        if (a.direction === 3 && b.direction !== 9) return false;
+        if (a.direction === 9 && b.direction !== 3) return false;
+    } else if (inversion === 'vertical&horizontal') {
+        if (a.direction === 1 && b.direction !== 9) return false;
+        if (a.direction === 9 && b.direction !== 1) return false;
+        if (a.direction === 2 && b.direction !== 8) return false;
+        if (a.direction === 8 && b.direction !== 2) return false;
+        if (a.direction === 3 && b.direction !== 7) return false;
+        if (a.direction === 7 && b.direction !== 3) return false;
+    } else if (a.direction !== b.direction) return false;
     if (a.punch1 !== b.punch1) return false;
     if (a.punch2 !== b.punch2) return false;
     if (a.punch3 !== b.punch3) return false;
@@ -11,18 +35,18 @@ const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
     return true;
 };
 
-const arcadeStickHistoryMatch = (a: ArcadeStickState[], b: ArcadeStickState[]) => {
+const arcadeStickHistoryMatch = (a: ArcadeStickState[], b: ArcadeStickState[], inversion?: Inversion) => {
     const compare = a.length > b.length ? [...b].reverse() : [...a].reverse();
     const against = a.length > b.length ? a : b;
     for (let i = 0; i < compare.length; i++) {
-        if (!arcadeStickStatesEqual(compare[i], against[i])) return false;
+        if (!arcadeStickStatesEqual(compare[i], against[i], inversion)) return false;
     }
     return true;
 };
 
-export const arcadeStickHistoryMultiMatch = (a: ArcadeStickState[], b: ArcadeStickState[][]) => {
+export const arcadeStickHistoryMatchMove = (a: ArcadeStickState[], b: ArcadeStickState[][], inversion?: Inversion) => {
     for (let i = 0; i < b.length; i++) {
-        if (arcadeStickHistoryMatch(a, b[i])) return true;
+        if (arcadeStickHistoryMatch(a, b[i], inversion)) return true;
     }
     return false;
 };
@@ -53,22 +77,6 @@ const createMove = (...moves: ArcadeStickState[][]) => {
 
 const copyMove = (move: ArcadeStickState[][]) => move.map(steps => steps.map(step => ({...step})));
 
-const reverseMove = (move: ArcadeStickState[][]) => {
-    const copy = copyMove(move);
-    for (let i = 0; i < copy.length; i++) {
-        const steps = copy[i];
-        for (let k = 0; k < steps.length; k++) {
-            if (steps[k].direction === 1) steps[k].direction = 3;
-            else if (steps[k].direction === 3) steps[k].direction = 1;
-            else if (steps[k].direction === 4) steps[k].direction = 6;
-            else if (steps[k].direction === 6) steps[k].direction = 4;
-            else if (steps[k].direction === 7) steps[k].direction = 9;
-            else if (steps[k].direction === 9) steps[k].direction = 7;
-        }
-    }
-    return copy;
-};
-
 const copyMoveButtonToButton = (move: ArcadeStickState[][], button: Button, changeTo: Button) => {
     const copy = copyMove(move);
     for (let i = 0; i < copy.length; i++) {
@@ -85,24 +93,18 @@ const copyMoveButtonToButton = (move: ArcadeStickState[][], button: Button, chan
 
 // moves
 
-export const shoryukenRightLight = createMove(
+export const shoryukenLight = createMove(
     [step(6), step(2), step(3, 'punch1')],
     [step(6), step(2), step(3), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3), step(3, 'punch1')],
 );
-export const shoryukenRightMedium = copyMoveButtonToButton(shoryukenRightLight, 'punch1', 'punch2');
-export const shoryukenRightHeavy = copyMoveButtonToButton(shoryukenRightLight, 'punch1', 'punch3');
-export const shoryukenLeftLight = reverseMove(shoryukenRightLight);
-export const shoryukenLeftMedium = reverseMove(shoryukenRightMedium);
-export const shoryukenLeftHeavy = reverseMove(shoryukenRightHeavy);
+export const shoryukenMedium = copyMoveButtonToButton(shoryukenLight, 'punch1', 'punch2');
+export const shoryukenHeavy = copyMoveButtonToButton(shoryukenLight, 'punch1', 'punch3');
 
-export const hadoukenRightLight = createMove(
+export const hadoukenLight = createMove(
     [step(2), step(3), step(6, 'punch1')],
     [step(2), step(3), step(6), step(6, 'punch1')],
 );
-export const hadoukenRightMedium = copyMoveButtonToButton(hadoukenRightLight, 'punch1', 'punch2');
-export const hadoukenRightHeavy = copyMoveButtonToButton(hadoukenRightLight, 'punch1', 'punch3');
-export const hadoukenLeftLight = reverseMove(hadoukenRightLight);
-export const hadoukenLeftMedium = reverseMove(hadoukenRightMedium);
-export const hadoukenLeftHeavy = reverseMove(hadoukenRightHeavy);
+export const hadoukenMedium = copyMoveButtonToButton(hadoukenLight, 'punch1', 'punch2');
+export const hadoukenHeavy = copyMoveButtonToButton(hadoukenLight, 'punch1', 'punch3');
