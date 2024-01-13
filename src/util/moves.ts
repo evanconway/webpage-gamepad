@@ -1,7 +1,7 @@
 import { ArcadeStickStateTimed } from "../state/arcadeStickHistorySlice";
 import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 
-const MAX_TIME_BETWEEN_INPUTS_MS = 100;
+const MAX_TIME_BETWEEN_INPUTS_MS = 200;
 
 type Inversion = 'vertical' | 'horizontal' | 'vertical&horizontal';
 
