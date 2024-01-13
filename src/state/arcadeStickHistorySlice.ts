@@ -4,14 +4,18 @@ import { ArcadeStickState } from "./arcadeStickSlice";
 
 const MaxTrackedStates = 10;
 
-const initialState: ArcadeStickState[] = [];
+export interface ArcadeStickStateTimed extends ArcadeStickState {
+    timeMs: number,
+}
+
+const initialState: ArcadeStickStateTimed[] = [];
 
 export const arcadeStickHistorySlice = createSlice({
     name: 'arcade-stick-history',
     initialState,
     reducers: {
         addArcadeStickState: (state, action: PayloadAction<ArcadeStickState>) => {
-            state.unshift(action.payload);
+            state.unshift({...action.payload, timeMs: Date.now() });
             if (state.length > MaxTrackedStates) state.pop();
         },
     },

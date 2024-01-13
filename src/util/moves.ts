@@ -1,4 +1,7 @@
+import { ArcadeStickStateTimed } from "../state/arcadeStickHistorySlice";
 import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
+
+const MAX_TIME_BETWEEN_INPUTS_MS = 100;
 
 type Inversion = 'vertical' | 'horizontal' | 'vertical&horizontal';
 
@@ -35,18 +38,24 @@ const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState, invers
     return true;
 };
 
-const arcadeStickHistoryMatch = (a: ArcadeStickState[], b: ArcadeStickState[], inversion?: Inversion) => {
-    const compare = a.length > b.length ? [...b].reverse() : [...a].reverse();
-    const against = a.length > b.length ? a : b;
-    for (let i = 0; i < compare.length; i++) {
-        if (!arcadeStickStatesEqual(compare[i], against[i], inversion)) return false;
+const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeStickState[], inversion?: Inversion) => {
+    if (history.length < move.length) return false;
+    const moveReversed = [...move].reverse();
+    debugger;
+    for (let i = 0; i < move.length; i++) {
+        // check if time since last is close enough
+        if (i > 0) {
+            const timeDiff = history[i - 1].timeMs - history[i].timeMs;
+            if (timeDiff > MAX_TIME_BETWEEN_INPUTS_MS) return false;
+        }
+        if (!arcadeStickStatesEqual(moveReversed[i], history[i], inversion)) return false;
     }
     return true;
 };
 
-export const arcadeStickHistoryMatchMove = (a: ArcadeStickState[], b: ArcadeStickState[][], inversion?: Inversion) => {
-    for (let i = 0; i < b.length; i++) {
-        if (arcadeStickHistoryMatch(a, b[i], inversion)) return true;
+export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: ArcadeStickState[][], inversion?: Inversion) => {
+    for (let moveVersion = 0; moveVersion < move.length; moveVersion++) {
+        if (arcadeStickHistoryMatch(history, move[moveVersion], inversion)) return true;
     }
     return false;
 };
