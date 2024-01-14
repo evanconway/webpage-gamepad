@@ -3,7 +3,7 @@ import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 
 const MAX_TIME_BETWEEN_INPUTS_MS = 200;
 
-type Inversion = 'vertical' | 'horizontal' | 'vertical&horizontal';
+type Inversion = 'vertical' | 'horizontal';
 
 const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
     if (a.direction !== b.direction) return false;
@@ -31,7 +31,7 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
     return true;
 };
 
-interface Move {
+export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
 }

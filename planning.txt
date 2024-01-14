@@ -127,3 +127,7 @@ We managed to rework how we check moves. We also added time checking to input ch
 I was mulling over how to handle storing moves. I'm considering changing back to storing left/right versions of moves individually. We'll have to display the move to the users, and I kind of like the idea of displaying the exact inputs they need to give. Like 214P for a left facing hadouken, and 623P for a right facing shoryuken. So we'll have to remake our copyMoveMirrored function. Also... something that might be a very real issue is the legality of using words like "hadouken" or "shoryuken" to represent moves. There might be a legal claim to them, and I could get myself in trouble using them.
 
 So, let's remake our move system so we can create mirrors of moves easily. And display move names using anime notation.
+
+That wasn't too bad to rework. I was going to add the half circle moves next. However it's clear that now we'll run into the issue of overlapping moves. For example 41236PH overlaps with 236PH. Here's how I think we can handle that. First we'll create a new slice where we'll store all moves the user is currently checking for. Second we'll setup that stored state so moves are sorted by input lenght. You see I think checking for the longest move first should be a bullet proof way of ensuring we don't have accidental overlap. I think we may have to place move checking into the slice, but I'm not sure. Let's just create this slice that collects moves first, then see how we feel.
+
+

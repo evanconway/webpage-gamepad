@@ -3,6 +3,7 @@ import gamepads from './gamepadSlice';
 import keyboard from './keyboardSlice';
 import inputMapping from './actionInputMappingSlice';
 import arcadeStickHistory from './arcadeStickHistorySlice';
+import movesCheck from './movesCheckSlice';
 
 export const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
         keyboard,
         inputMapping,
         arcadeStickHistory,
+        movesCheck,
     },
 });
 
