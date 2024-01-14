@@ -120,3 +120,10 @@ We added left/right and light/medium/heavy versions of our 2 moves. But I'm unsu
 Actually, after looking over our logic, I bet we can modify our arcadeStickStateEqual function to account for left right and/or up down mirroring. Let's do that and see how it turns out.
 
 We managed to rework how we check moves. We also added time checking to input checking. So now if we input a move too slowly, it won't count. However I think we'll want to make this optional. Also I'm questioning if making mirror checking was a smart idea, because in the end version of this thing we'll want to pick moves which are randomly selected for us to do. We probably want to specifically pick left or right versions of moves. And I think it's smart to use anime notation for this thing. That way we don't have to worry about what to call the moves, and we can correctly display a forward or backward versions of moves. 
+
+
+14th of January, 2024
+
+I was mulling over how to handle storing moves. I'm considering changing back to storing left/right versions of moves individually. We'll have to display the move to the users, and I kind of like the idea of displaying the exact inputs they need to give. Like 214P for a left facing hadouken, and 623P for a right facing shoryuken. So we'll have to remake our copyMoveMirrored function. Also... something that might be a very real issue is the legality of using words like "hadouken" or "shoryuken" to represent moves. There might be a legal claim to them, and I could get myself in trouble using them.
+
+So, let's remake our move system so we can create mirrors of moves easily. And display move names using anime notation.
