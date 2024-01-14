@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { Move, arcadeStickHistoryMatchMove, move236PL, move236PM, move236PH, move214PL, move214PM, move214PH, move623PL, move623PM, move623PH, move421PH, move421PL, move421PM, move41236PL, move63214PL } from "../util/moves";
+import { Move, arcadeStickHistoryMatchMove, move236PL, move236PM, move236PH, move214PL, move214PM, move214PH, move623PL, move623PM, move623PH, move421PH, move421PL, move421PM, move41236PL, move63214PL, move66, move44, move22, move88 } from "../util/moves";
 import { selectArcadeStickHistory } from "./arcadeStickHistorySlice";
 
 interface InitialState {
@@ -24,6 +24,10 @@ const initialState: InitialState = {
         move421PH,
         move41236PL,
         move63214PL,
+        move66,
+        move44,
+        move22,
+        move88,
     ],
     targetMove: move236PL,
 };

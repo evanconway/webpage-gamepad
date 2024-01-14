@@ -148,3 +148,8 @@ export const move41236PL = createMove(
     [step(4), step(1), step(2), step(3), step(6), step(6, 'punch1')],
 );
 export const move63214PL = copyMoveDirectionChange(move41236PL, '63214PL', 'horizontal');
+
+export const move66 = createMove('66', [step(6), step(5), step(6)]);
+export const move44 = copyMoveDirectionChange(move66, '44', 'horizontal');
+export const move22 = createMove('22', [step(2), step(5), step(2)]);
+export const move88 = copyMoveDirectionChange(move22, '88', 'vertical');
