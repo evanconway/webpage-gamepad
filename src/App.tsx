@@ -1,9 +1,8 @@
 import CrudeStickDisplay from './components/CrudeStickDisplay';
 import Mapper from './components/Mapper';
-import Input from './components/Input';
 import History from './components/History';
-import Moves from './components/Moves';
 import TargetMove from './components/TargetMove';
+import Input from './components/Input';
 
 const App = () => (
 	<div>
