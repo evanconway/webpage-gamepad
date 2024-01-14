@@ -113,6 +113,10 @@ const copyMoveButtonToButton = (move: Move, newName: string, button: Button, cha
 };
 
 // moves
+/*
+The shortest execution path should be first. This prevents overlaps in
+move detection.
+*/
 
 export const move623PL = createMove(
     '623PL',
@@ -137,3 +141,10 @@ export const move236PH = copyMoveButtonToButton(move236PL, '236PH', 'punch1', 'p
 export const move214PL = copyMoveDirectionChange(move236PL, '214PL', 'horizontal');
 export const move214PM = copyMoveDirectionChange(move236PM, '214PM', 'horizontal');
 export const move214PH = copyMoveDirectionChange(move236PH, '214PH', 'horizontal');
+
+export const move41236PL = createMove(
+    '41236PL',
+    [step(4), step(1), step(2), step(3), step(6, 'punch1')],
+    [step(4), step(1), step(2), step(3), step(6), step(6, 'punch1')],
+);
+export const move63214PL = copyMoveDirectionChange(move41236PL, '63214PL', 'horizontal');
