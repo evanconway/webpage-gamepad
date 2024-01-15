@@ -37,7 +37,9 @@ export interface Move {
 }
 
 export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
-    if (move.alternateMatchHistoryFunction !== undefined) return move.alternateMatchHistoryFunction(history);
+    if (move.alternateMatchHistoryFunction !== undefined) {
+        return move.alternateMatchHistoryFunction(history);
+    }
     for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
         if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
     }
@@ -126,19 +128,6 @@ export const move623PL = createMove(
     [step(6), step(5), step(2), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3), step(3, 'punch1')],
 );
-move623PL.alternateMatchHistoryFunction = (history) => {
-    const viableHistories: ArcadeStickState[][] = [
-        [step(6), step(2), step(3, 'punch1')],
-        [step(6), step(2), step(3), step(3, 'punch1')],
-        [step(6), step(5), step(2), step(3, 'punch1')],
-        [step(6), step(5), step(2), step(3), step(3, 'punch1')],
-    ];
-    for (let moveVersion = 0; moveVersion < viableHistories.length; moveVersion++) {
-        if (arcadeStickHistoryMatch(history, viableHistories[moveVersion])) return true;
-    }
-    return false;
-};
-
 export const move623PM = copyMoveButtonToButton(move623PL, '623PM', 'punch1', 'punch2');
 export const move623PH = copyMoveButtonToButton(move623PL, '623PH', 'punch1', 'punch3');
 export const move421PL = copyMoveDirectionChange(move623PL, '421PL', 'horizontal');
@@ -176,13 +165,42 @@ const directionIsCardinal = (direction: Direction) => {
     return false;
 };
 
+/**
+ * Given 2 cardinal directions, determine rotation between them.
+ * Returns false if directions do not form a rotation.
+ * 
+ * @param from 
+ * @param to 
+ * @returns 
+ */
+const getRotationBetweenCardinals = (from: (2 | 4 | 6 | 8), to: (2 | 4 | 6 | 8)) => {
+    if (from === 2 && to === 8) return false;
+    else if (from === 2 && to === 4) return 'clockwise';
+    else if (from === 2 && to === 6) return 'counter';
+    else if (from === 4 && to === 6) return false;
+    else if (from === 4 && to === 8) return 'clockwise';
+    else if (from === 4 && to === 2) return 'counter';
+    else if (from === 8 && to === 2) return false;
+    else if (from === 8 && to === 6) return 'clockwise';
+    else if (from === 8 && to === 4) return 'counter';
+    else if (from === 6 && to === 4) return false;
+    else if (from === 6 && to === 2) return 'clockwise';
+    else if (from === 6 && to === 8) return 'counter';
+    return false;
+};
+
+/*
+    The typical 360 move is not determined with strict inputs. In most games, as long
+    as the user hits all cardinal directions in a clockwise or counter-clockwise order,
+    the game gives them the move. This logic here recreates that.
+*/
 export const move360PL: Move = {
     ...createMove('360PL', []),
     alternateMatchHistoryFunction: (history) => {
+        if (history.length < 4) return false;
         if (history[0].direction === 5) return false;
-        let firstCardinal: Direction | null = null;
         const cardinalsHit = new Set<2 | 4 | 6 | 8>();
-        const rotation: 'clockwise' | 'counter' | null = null;
+        let rotation: 'clockwise' | 'counter' | null = null;
         let lastCardinal: 2 | 4 | 6 | 8 | null = null;
         for (let i = 0; i < history.length; i++) {
             const step = history[i];
@@ -194,15 +212,30 @@ export const move360PL: Move = {
             if (i === 0 && !step.punch1) return false;
             else if (step.punch1) return false;
 
-            // establish starting cardinal direction
-            if (firstCardinal === null && directionIsCardinal(step.direction)) {
-                firstCardinal = step.direction;
+            // cardinals
+            if (directionIsCardinal(step.direction)) {
+                const cardinal = step.direction as (2 | 4 | 6 | 8);
+                cardinalsHit.add(cardinal as (2 | 4 | 6 | 8));
+
+                // if first cardinal encountered, mark as last Cardinal
+                // otherwise handle checking correct rotation
+                if (lastCardinal === null) lastCardinal = cardinal;
+                else if (cardinal !== lastCardinal) {
+                    // determine rotation if not yet determined, return false if cardinal doesn't make sense for circle motion
+                    if (rotation === null) {
+                        const newRotation = getRotationBetweenCardinals(lastCardinal, cardinal);
+                        if (newRotation === false) return false;
+                        rotation = newRotation;
+                    }
+
+                    // if rotation does not match determined rotation, return false
+                    if (rotation !== getRotationBetweenCardinals(lastCardinal, cardinal)) return false;
+                }
+
+                // here, no state has triggered failure
+                // if all cardinals have been hit, input history is a valid 360
+                if (cardinalsHit.has(2) && cardinalsHit.has(4) && cardinalsHit.has(6) && cardinalsHit.has(8)) return true;
             }
-
-            // handle direction
-
-            // track all cardinals
-            if (directionIsCardinal(step.direction)) cardinalsHit.add(step.direction as (2 | 4 | 6 | 8));
         }
         return true;
     },
