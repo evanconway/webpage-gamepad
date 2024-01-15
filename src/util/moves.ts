@@ -33,11 +33,11 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
 export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
-    matchHistoryFunction?: (history: ArcadeStickStateTimed[]) => boolean,
+    alternateMatchHistoryFunction?: (history: ArcadeStickStateTimed[]) => boolean,
 }
 
 export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
-    if (move.matchHistoryFunction !== undefined) return move.matchHistoryFunction(history);
+    if (move.alternateMatchHistoryFunction !== undefined) return move.alternateMatchHistoryFunction(history);
     for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
         if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
     }
@@ -126,7 +126,7 @@ export const move623PL = createMove(
     [step(6), step(5), step(2), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3), step(3, 'punch1')],
 );
-move623PL.matchHistoryFunction = (history) => {
+move623PL.alternateMatchHistoryFunction = (history) => {
     const viableHistories: ArcadeStickState[][] = [
         [step(6), step(2), step(3, 'punch1')],
         [step(6), step(2), step(3), step(3, 'punch1')],
@@ -167,3 +167,43 @@ export const move66 = createMove('66', [step(6), step(5), step(6)]);
 export const move44 = copyMoveDirectionChange(move66, '44', 'horizontal');
 export const move22 = createMove('22', [step(2), step(5), step(2)]);
 export const move88 = copyMoveDirectionChange(move22, '88', 'vertical');
+
+const directionIsCardinal = (direction: Direction) => {
+    if (direction === 2) return true;
+    if (direction === 4) return true;
+    if (direction === 6) return true;
+    if (direction === 8) return true;
+    return false;
+};
+
+export const move360PL: Move = {
+    ...createMove('360PL', []),
+    alternateMatchHistoryFunction: (history) => {
+        if (history[0].direction === 5) return false;
+        let firstCardinal: Direction | null = null;
+        const cardinalsHit = new Set<2 | 4 | 6 | 8>();
+        const rotation: 'clockwise' | 'counter' | null = null;
+        let lastCardinal: 2 | 4 | 6 | 8 | null = null;
+        for (let i = 0; i < history.length; i++) {
+            const step = history[i];
+
+            // inputs that are never allowed
+            if (step.kick1 || step.kick2 || step.kick3 || step.punch2 || step.punch3) return false;
+
+            // input allowed on final state only
+            if (i === 0 && !step.punch1) return false;
+            else if (step.punch1) return false;
+
+            // establish starting cardinal direction
+            if (firstCardinal === null && directionIsCardinal(step.direction)) {
+                firstCardinal = step.direction;
+            }
+
+            // handle direction
+
+            // track all cardinals
+            if (directionIsCardinal(step.direction)) cardinalsHit.add(step.direction as (2 | 4 | 6 | 8));
+        }
+        return true;
+    },
+};
