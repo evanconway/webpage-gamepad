@@ -19,7 +19,6 @@ const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
 const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeStickState[]) => {
     if (history.length < move.length) return false;
     const moveReversed = [...move].reverse();
-    debugger;
     for (let i = 0; i < move.length; i++) {
         // check if time since last is close enough
         if (i > 0) {
@@ -34,9 +33,11 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
 export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
+    matchHistoryFunction?: (history: ArcadeStickStateTimed[]) => boolean,
 }
 
 export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
+    if (move.matchHistoryFunction !== undefined) return move.matchHistoryFunction(history);
     for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
         if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
     }
@@ -125,6 +126,19 @@ export const move623PL = createMove(
     [step(6), step(5), step(2), step(3, 'punch1')],
     [step(6), step(5), step(2), step(3), step(3, 'punch1')],
 );
+move623PL.matchHistoryFunction = (history) => {
+    const viableHistories: ArcadeStickState[][] = [
+        [step(6), step(2), step(3, 'punch1')],
+        [step(6), step(2), step(3), step(3, 'punch1')],
+        [step(6), step(5), step(2), step(3, 'punch1')],
+        [step(6), step(5), step(2), step(3), step(3, 'punch1')],
+    ];
+    for (let moveVersion = 0; moveVersion < viableHistories.length; moveVersion++) {
+        if (arcadeStickHistoryMatch(history, viableHistories[moveVersion])) return true;
+    }
+    return false;
+};
+
 export const move623PM = copyMoveButtonToButton(move623PL, '623PM', 'punch1', 'punch2');
 export const move623PH = copyMoveButtonToButton(move623PL, '623PH', 'punch1', 'punch3');
 export const move421PL = copyMoveDirectionChange(move623PL, '421PL', 'horizontal');
