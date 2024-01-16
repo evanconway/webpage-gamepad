@@ -8,29 +8,31 @@ interface InitialState {
     targetMove: Move,
 }
 
-const initialState: InitialState = {
-    moves: [
-        move236PL,
-        move236PM,
-        move236PH,
-        move214PL,
-        move214PM,
-        move214PH,
-        move623PL,
-        move623PM,
-        move623PH,
-        move421PL,
-        move421PM,
-        move421PH,
-        move41236PL,
-        move63214PL,
-        move66,
-        move44,
-        move22,
-        move88,
+const initialStateMoves: Move[] = [
+        // move236PL,
+        // move236PM,
+        // move236PH,
+        // move214PL,
+        // move214PM,
+        // move214PH,
+        // move623PL,
+        // move623PM,
+        // move623PH,
+        // move421PL,
+        // move421PM,
+        // move421PH,
+        // move41236PL,
+        // move63214PL,
+        // move66,
+        // move44,
+        // move22,
+        // move88,
         move360PL,
-    ],
-    targetMove: move236PL,
+];
+
+const initialState: InitialState = {
+    moves: initialStateMoves,
+    targetMove: initialStateMoves[0],
 };
 
 initialState.moves.sort((a, b) => b.inputHistories[0].length - a.inputHistories[0].length);

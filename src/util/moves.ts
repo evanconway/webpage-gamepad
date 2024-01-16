@@ -4,6 +4,53 @@ import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 const MAX_TIME_BETWEEN_INPUTS_MS = 200;
 
 type Inversion = 'vertical' | 'horizontal';
+type AlternateMatchHistoryFunction = (history: ArcadeStickStateTimed[]) => boolean;
+type AlternateMatchHistoryFunctionName = 'circlePunch1';
+
+const alternateMatchHistoryFunctions: Record<AlternateMatchHistoryFunctionName, AlternateMatchHistoryFunction> = {
+    circlePunch1: (history) => {
+        if (history.length < 4) return false;
+        if (history[0].direction === 5) return false;
+        const cardinalsHit = new Set<2 | 4 | 6 | 8>();
+        let rotation: 'clockwise' | 'counter' | null = null;
+        let lastCardinal: 2 | 4 | 6 | 8 | null = null;
+        for (let i = 0; i < history.length; i++) {
+            const step = history[i];
+    
+            // inputs that are never allowed
+            if (step.kick1 || step.kick2 || step.kick3 || step.punch2 || step.punch3) return false;
+    
+            // input allowed on final state only
+            if (i === 0 && !step.punch1) return false;
+            else if (i!== 0 && step.punch1) return false;
+            debugger;
+            // cardinals
+            if (directionIsCardinal(step.direction)) {
+                const cardinal = step.direction as (2 | 4 | 6 | 8);
+                cardinalsHit.add(cardinal as (2 | 4 | 6 | 8));
+    
+                // if first cardinal encountered, mark as last Cardinal
+                // otherwise handle checking correct rotation
+                if (lastCardinal === null) lastCardinal = cardinal;
+                else if (cardinal !== lastCardinal) {
+                    // determine rotation if not yet determined, return false if cardinal doesn't make sense for circle motion
+                    if (rotation === null) {
+                        const newRotation = getRotationBetweenCardinals(lastCardinal, cardinal);
+                        if (newRotation === false) return false;
+                        rotation = newRotation;
+                    }
+                    // if rotation does not match determined rotation, return false
+                    if (rotation !== getRotationBetweenCardinals(lastCardinal, cardinal)) return false;
+                    lastCardinal = cardinal;
+                }
+            }
+            // here, no state has triggered failure
+            // if all cardinals have been hit, input history is a valid 360
+            if (cardinalsHit.has(2) && cardinalsHit.has(4) && cardinalsHit.has(6) && cardinalsHit.has(8)) return true;
+        }
+        return true;
+    },
+};
 
 const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
     if (a.direction !== b.direction) return false;
@@ -33,12 +80,12 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
 export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
-    alternateMatchHistoryFunction?: (history: ArcadeStickStateTimed[]) => boolean,
+    alternateMatchHistoryFunction?: AlternateMatchHistoryFunctionName,
 }
 
 export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
     if (move.alternateMatchHistoryFunction !== undefined) {
-        return move.alternateMatchHistoryFunction(history);
+        return alternateMatchHistoryFunctions[move.alternateMatchHistoryFunction](history);
     }
     for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
         if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
@@ -196,47 +243,5 @@ const getRotationBetweenCardinals = (from: (2 | 4 | 6 | 8), to: (2 | 4 | 6 | 8))
 */
 export const move360PL: Move = {
     ...createMove('360PL', []),
-    alternateMatchHistoryFunction: (history) => {
-        if (history.length < 4) return false;
-        if (history[0].direction === 5) return false;
-        const cardinalsHit = new Set<2 | 4 | 6 | 8>();
-        let rotation: 'clockwise' | 'counter' | null = null;
-        let lastCardinal: 2 | 4 | 6 | 8 | null = null;
-        for (let i = 0; i < history.length; i++) {
-            const step = history[i];
-
-            // inputs that are never allowed
-            if (step.kick1 || step.kick2 || step.kick3 || step.punch2 || step.punch3) return false;
-
-            // input allowed on final state only
-            if (i === 0 && !step.punch1) return false;
-            else if (step.punch1) return false;
-
-            // cardinals
-            if (directionIsCardinal(step.direction)) {
-                const cardinal = step.direction as (2 | 4 | 6 | 8);
-                cardinalsHit.add(cardinal as (2 | 4 | 6 | 8));
-
-                // if first cardinal encountered, mark as last Cardinal
-                // otherwise handle checking correct rotation
-                if (lastCardinal === null) lastCardinal = cardinal;
-                else if (cardinal !== lastCardinal) {
-                    // determine rotation if not yet determined, return false if cardinal doesn't make sense for circle motion
-                    if (rotation === null) {
-                        const newRotation = getRotationBetweenCardinals(lastCardinal, cardinal);
-                        if (newRotation === false) return false;
-                        rotation = newRotation;
-                    }
-
-                    // if rotation does not match determined rotation, return false
-                    if (rotation !== getRotationBetweenCardinals(lastCardinal, cardinal)) return false;
-                }
-
-                // here, no state has triggered failure
-                // if all cardinals have been hit, input history is a valid 360
-                if (cardinalsHit.has(2) && cardinalsHit.has(4) && cardinalsHit.has(6) && cardinalsHit.has(8)) return true;
-            }
-        }
-        return true;
-    },
+    alternateMatchHistoryFunction: 'circlePunch1',
 };

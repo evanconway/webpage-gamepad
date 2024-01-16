@@ -2,7 +2,7 @@ import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ArcadeStickState } from "./arcadeStickSlice";
 
-const MaxTrackedStates = 10;
+const MaxTrackedStates = 25;
 
 export interface ArcadeStickStateTimed extends ArcadeStickState {
     timeMs: number,
