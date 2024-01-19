@@ -17,6 +17,9 @@ const alternateMatchHistoryFunctions: Record<AlternateMatchHistoryFunctionName, 
         for (let i = 0; i < history.length; i++) {
             const step = history[i];
     
+            // ensure move is executed quickly enough
+            if (i > 0 && step.timeMs - history[i - 1].timeMs > 300) return false;
+
             // inputs that are never allowed
             if (step.kick1 || step.kick2 || step.kick3 || step.punch2 || step.punch3) return false;
     
