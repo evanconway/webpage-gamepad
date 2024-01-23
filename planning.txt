@@ -146,3 +146,8 @@ We were able to fix our circle input and move the function out of redux state. I
 So, I'd like to redo how we detect moves so that the system works more like how actual games work. But I think we'll put that off for later. At this moment we have a bunch of moves that can be correctly identified. I think we should add components which let the user select which moves will be randomly selected. Or if one move should be drilled. 
 
 I also want to put some though into the input display. I think it'd be cool for the user to be able to see when they input something incorrectly. Honestly this should be straight forward to most moves. But what about the 360? The 360 can be performed a number of different ways. I'm not sure how best to display that. Maybe we insist on a specific way of performing the 360? These requires some thought.
+
+
+2nd of January, 2024
+
+After chatting with some people and thinking about this, I had an idea. Each move should have a function that determines if the given input history is valid, and also a function which determines if the given input history is on track to be the given move. This way we could display the input history of the user, and highlight moves in green until they're no longer valid for the move. Ooh, or maybe we should have the function return the index of the first input state in a given history that doesn't work for a move. That might be best, but I realized I'm making the assumption the given input history will only be states that are an attempt at the given move. So after the user completes a move, should we clear the input history? Or perhaps wait for the user to let the controller return to a neutral state (direction 5, no buttons pressed) before attempting to check input history?
