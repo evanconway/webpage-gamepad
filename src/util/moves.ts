@@ -4,10 +4,11 @@ import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 const MAX_TIME_BETWEEN_INPUTS_MS = 200;
 
 type Inversion = 'vertical' | 'horizontal';
-type AlternateMatchHistoryFunction = (history: ArcadeStickStateTimed[]) => boolean;
-type AlternateMatchHistoryFunctionName = 'circlePunch1';
+type MatchHistoryFunction = (history: ArcadeStickStateTimed[]) => boolean;
+type MoveNames = 'circlePunch1';
+type GetIndexOfUnmatchedInput = (history: ArcadeStickStateTimed[]) => number;
 
-const alternateMatchHistoryFunctions: Record<AlternateMatchHistoryFunctionName, AlternateMatchHistoryFunction> = {
+const alternateMatchHistoryFunctions: Record<MoveNames, MatchHistoryFunction> = {
     circlePunch1: (history) => {
         if (history.length < 4) return false;
         if (history[0].direction === 5) return false;
@@ -83,12 +84,13 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
 export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
-    alternateMatchHistoryFunction?: AlternateMatchHistoryFunctionName,
+    getHistoryMatch?: MoveNames, // return true if given history matches for move
+    getIndexOfFailedHistoryMatch?: 
 }
 
 export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
-    if (move.alternateMatchHistoryFunction !== undefined) {
-        return alternateMatchHistoryFunctions[move.alternateMatchHistoryFunction](history);
+    if (move.getHistoryMatch !== undefined) {
+        return alternateMatchHistoryFunctions[move.getHistoryMatch](history);
     }
     for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
         if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
@@ -246,5 +248,5 @@ const getRotationBetweenCardinals = (from: (2 | 4 | 6 | 8), to: (2 | 4 | 6 | 8))
 */
 export const move360PL: Move = {
     ...createMove('360PL', []),
-    alternateMatchHistoryFunction: 'circlePunch1',
+    getHistoryMatch: 'circlePunch1',
 };
