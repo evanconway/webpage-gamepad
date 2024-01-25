@@ -148,6 +148,15 @@ So, I'd like to redo how we detect moves so that the system works more like how 
 I also want to put some though into the input display. I think it'd be cool for the user to be able to see when they input something incorrectly. Honestly this should be straight forward to most moves. But what about the 360? The 360 can be performed a number of different ways. I'm not sure how best to display that. Maybe we insist on a specific way of performing the 360? These requires some thought.
 
 
-2nd of January, 2024
+22nd of January, 2024
 
 After chatting with some people and thinking about this, I had an idea. Each move should have a function that determines if the given input history is valid, and also a function which determines if the given input history is on track to be the given move. This way we could display the input history of the user, and highlight moves in green until they're no longer valid for the move. Ooh, or maybe we should have the function return the index of the first input state in a given history that doesn't work for a move. That might be best, but I realized I'm making the assumption the given input history will only be states that are an attempt at the given move. So after the user completes a move, should we clear the input history? Or perhaps wait for the user to let the controller return to a neutral state (direction 5, no buttons pressed) before attempting to check input history?
+
+
+24th of January, 2024
+
+Reflecting on inputs again. I was just playing Undernight 2 and the tutorial specifically mentioned that it's possible to trigger a 360 motion with 632147. This is very different from the "just hit all the cardinals" attitude I used for the 360 originally.
+
+I can't remember if I reflected on this yet, but I think we can make a set of functions that interpret moves the very exact way we did before, in addition to more loose, weird functions like the 360. So we could simply add the 632147 motion as another move. We could continue with our plan of detecting if a fresh history is correct for the move up to a certain point, and detecting which input is the first "wrong" input.
+
+Actually what I should add here, is a note about the difference between detecting where a specific history goes wrong for a move, and detecting if a given history triggers a move. The former starts at the beginning of the history, and checks until an incorrect or the final correct input occurs. The latter starts with the end of the history, and detects the move in reverse. Do we need both detection styles in this app? Detecting if a move occurs going from the end of the history and working backwards is how I'd implement this in an actual game, but we need detection from history start for display incorrect inputs for a targetted move. It seems very wrong to have 2 very different styles of input detection. And definitely seems like we should use the more game-correct style, and somehow work it to detect the first incorrect input for a given move. I need to think about this more...

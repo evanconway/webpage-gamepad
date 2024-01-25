@@ -8,6 +8,8 @@ type MatchHistoryFunction = (history: ArcadeStickStateTimed[]) => boolean;
 type MoveNames = 'circlePunch1';
 type GetIndexOfUnmatchedInput = (history: ArcadeStickStateTimed[]) => number;
 
+// Most moves can simply check against a variety of input histories. We define those here.
+
 const alternateMatchHistoryFunctions: Record<MoveNames, MatchHistoryFunction> = {
     circlePunch1: (history) => {
         if (history.length < 4) return false;
