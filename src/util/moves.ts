@@ -83,6 +83,22 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
     return true;
 };
 
+/**
+ * Given an input history and a move history, return the status of their comparison.
+ * 
+ * @param history 
+ * @param move 
+ * @returns 
+ */
+const arcadeStickHistoryMatchMoveForward = (history: ArcadeStickStateTimed[], move: ArcadeStickState[]) => {
+    const maxIndex = history.length > move.length ? history.length : move.length;
+    for (let i = 0; i < maxIndex; i++) {
+        if (!arcadeStickStatesEqual(history[i], move[i])) return 'invalid';
+    }
+    if (history.length == move.length) return 'complete';
+    return 'ontrack';
+};
+
 export interface Move {
     inputHistories: ArcadeStickState[][];
     name: string,
