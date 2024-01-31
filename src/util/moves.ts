@@ -1,62 +1,9 @@
-import { ArcadeStickStateTimed } from "../state/arcadeStickHistorySlice";
+import { ArcadeStickHistoryState } from "../state/arcadeStickHistorySlice";
 import { ArcadeStickState, Direction } from "../state/arcadeStickSlice";
 
 const MAX_TIME_BETWEEN_INPUTS_MS = 200;
 
-type Inversion = 'vertical' | 'horizontal';
-type MatchHistoryFunction = (history: ArcadeStickStateTimed[]) => boolean;
-type MoveNames = 'circlePunch1';
-type GetIndexOfUnmatchedInput = (history: ArcadeStickStateTimed[]) => number;
-
 // Most moves can simply check against a variety of input histories. We define those here.
-
-const alternateMatchHistoryFunctions: Record<MoveNames, MatchHistoryFunction> = {
-    circlePunch1: (history) => {
-        if (history.length < 4) return false;
-        if (history[0].direction === 5) return false;
-        const cardinalsHit = new Set<2 | 4 | 6 | 8>();
-        let rotation: 'clockwise' | 'counter' | null = null;
-        let lastCardinal: 2 | 4 | 6 | 8 | null = null;
-        for (let i = 0; i < history.length; i++) {
-            const step = history[i];
-    
-            // ensure move is executed quickly enough
-            if (i > 0 && step.timeMs - history[i - 1].timeMs > 300) return false;
-
-            // inputs that are never allowed
-            if (step.kick1 || step.kick2 || step.kick3 || step.punch2 || step.punch3) return false;
-    
-            // input allowed on final state only
-            if (i === 0 && !step.punch1) return false;
-            else if (i!== 0 && step.punch1) return false;
-            debugger;
-            // cardinals
-            if (directionIsCardinal(step.direction)) {
-                const cardinal = step.direction as (2 | 4 | 6 | 8);
-                cardinalsHit.add(cardinal as (2 | 4 | 6 | 8));
-    
-                // if first cardinal encountered, mark as last Cardinal
-                // otherwise handle checking correct rotation
-                if (lastCardinal === null) lastCardinal = cardinal;
-                else if (cardinal !== lastCardinal) {
-                    // determine rotation if not yet determined, return false if cardinal doesn't make sense for circle motion
-                    if (rotation === null) {
-                        const newRotation = getRotationBetweenCardinals(lastCardinal, cardinal);
-                        if (newRotation === false) return false;
-                        rotation = newRotation;
-                    }
-                    // if rotation does not match determined rotation, return false
-                    if (rotation !== getRotationBetweenCardinals(lastCardinal, cardinal)) return false;
-                    lastCardinal = cardinal;
-                }
-            }
-            // here, no state has triggered failure
-            // if all cardinals have been hit, input history is a valid 360
-            if (cardinalsHit.has(2) && cardinalsHit.has(4) && cardinalsHit.has(6) && cardinalsHit.has(8)) return true;
-        }
-        return true;
-    },
-};
 
 const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
     if (a.direction !== b.direction) return false;
@@ -69,7 +16,7 @@ const arcadeStickStatesEqual = (a: ArcadeStickState, b: ArcadeStickState) => {
     return true;
 };
 
-const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeStickState[]) => {
+const arcadeStickHistoryMatch = (history: ArcadeStickHistoryState[], move: ArcadeStickState[]) => {
     if (history.length < move.length) return false;
     const moveReversed = [...move].reverse();
     for (let i = 0; i < move.length; i++) {
@@ -83,188 +30,84 @@ const arcadeStickHistoryMatch = (history: ArcadeStickStateTimed[], move: ArcadeS
     return true;
 };
 
-/**
- * Given an input history and a move history, return the status of their comparison.
- * 
- * @param history 
- * @param move 
- * @returns 
- */
-const arcadeStickHistoryMatchMoveForward = (history: ArcadeStickStateTimed[], move: ArcadeStickState[]) => {
-    const maxIndex = history.length > move.length ? history.length : move.length;
-    for (let i = 0; i < maxIndex; i++) {
-        if (!arcadeStickStatesEqual(history[i], move[i])) return 'invalid';
-    }
-    if (history.length == move.length) return 'complete';
-    return 'ontrack';
-};
+interface MoveButton {
+    down: boolean,
+    pressed: boolean,
+}
+
+interface MoveStep {
+    dir?: Direction,
+    punch1?: MoveButton,
+    punch2?: MoveButton,
+    punch3?: MoveButton,
+    kick1?: MoveButton,
+    kick2?: MoveButton,
+    kick3?: MoveButton,
+}
 
 export interface Move {
-    inputHistories: ArcadeStickState[][];
+    steps: MoveStep[];
     name: string,
-    getHistoryMatch?: MoveNames, // return true if given history matches for move
-    getIndexOfFailedHistoryMatch?: 
 }
 
-export const arcadeStickHistoryMatchMove = (history: ArcadeStickStateTimed[], move: Move) => {
-    if (move.getHistoryMatch !== undefined) {
-        return alternateMatchHistoryFunctions[move.getHistoryMatch](history);
+const moveStepMatchesHistoryState = (moveStep: MoveStep, historyStep: ArcadeStickHistoryState) => {
+    if (moveStep.dir !== undefined && moveStep.dir !== historyStep.direction.direction) return false;
+    return true;
+};
+
+export const arcadeStickHistoryMatchMove = (history: ArcadeStickHistoryState[], move: Move) => {
+    const historyReversed = [...history].reverse();
+    let indexHistory = 0;
+    let indexMove = 0;
+
+    let checking = true;
+    while (checking) {
+
     }
-    for (let moveVersion = 0; moveVersion < move.inputHistories.length; moveVersion++) {
-        if (arcadeStickHistoryMatch(history, move.inputHistories[moveVersion])) return true;
+
+    /*
+        Iterate over both steps in history and the move. We only advance the history to check once
+        it does not match for a step in a move. The same step in history could be valid for multiple
+        steps in a move.
+    */
+
+    
+    
+
+    for (let i = 0; i < move.steps.length)
+    for (let moveVersion = 0; moveVersion < move.steps.length; moveVersion++) {
+        if (arcadeStickHistoryMatch(history, move.steps[moveVersion])) return true;
     }
     return false;
 };
 
-type Button = 'punch1' | 'punch2' | 'punch3' | 'kick1' | 'kick2' | 'kick3';
-
-const getButtons = (buttons?: Button | Button[]) => {
-    const result = { punch1: false, punch2: false, punch3: false, kick1: false, kick2: false, kick3: false };
-    if (buttons === undefined) return result;
-    if (Array.isArray(buttons)) buttons.forEach(button => result[button] = true);
-    else result[buttons] = true;
-    return result;
-};
-
-const step = (direction: Direction, buttons?: Button | Button[]) => {
-    return { direction, ...getButtons(buttons) };
-};
-
-/*
-An array of steps define a valid input sequence for a move. A complete move
-definition is an array of these step arrays, each a slightly different but
-legal way of inputting the move.
-*/
-
-const createMove = (name: string, ...moves: ArcadeStickState[][]): Move => {
-    return {
-        name,
-        inputHistories: moves,
-    };
-}
-
-const copyInputHistories = (move: ArcadeStickState[][]) => move.map(steps => steps.map(step => ({...step})));
-
-const copyMoveDirectionChange = (move: Move, newName: string, inversion: Inversion): Move => {
-    const inputHistories = copyInputHistories(move.inputHistories);
-    for (let i = 0; i < inputHistories.length; i++) {
-        const steps = inputHistories[i];
-        for (let k = 0; k < steps.length; k++) {
-            const step = steps[k];
-            if (inversion === 'horizontal') {
-                if (step.direction === 1) step.direction = 3;
-                else if (step.direction === 4) step.direction = 6;
-                else if (step.direction === 7) step.direction = 9;
-                else if (step.direction === 3) step.direction = 1;
-                else if (step.direction === 6) step.direction = 4;
-                else if (step.direction === 9) step.direction = 7;
-            } else if (inversion === 'vertical') {
-                if (step.direction === 1) step.direction = 7;
-                else if (step.direction === 2) step.direction = 8;
-                else if (step.direction === 3) step.direction = 9;
-                else if (step.direction === 7) step.direction = 1;
-                else if (step.direction === 8) step.direction = 2;
-                else if (step.direction === 9) step.direction = 3;
-            }
-        }
-    }
-    return { name: newName, inputHistories };
-};
-
-const copyMoveButtonToButton = (move: Move, newName: string, button: Button, changeTo: Button): Move => {
-    const inputHistories = copyInputHistories(move.inputHistories);
-    for (let i = 0; i < inputHistories.length; i++) {
-        const steps = inputHistories[i];
-        for (let k = 0; k < steps.length; k++) {
-            if (steps[k][button] === true) {
-                steps[k][button] = false;
-                steps[k][changeTo] = true;
-            }
-        }
-    }
-    return { name: newName, inputHistories };
-};
+const createMove = (name: string, ...steps: MoveStep[]): Move => ({ name, steps });
 
 // moves
-/*
-The shortest execution path should be first. This prevents overlaps in
-move detection.
-*/
+export const move623PL = createMove('623PL', { dir: 6 }, { dir: 2 }, { dir: 3 }, { punch1: { down: true, pressed: true }});
+export const move623PM = createMove('623PM', { dir: 6 }, { dir: 2 }, { dir: 3 }, { punch2: { down: true, pressed: true }});
+export const move623PH = createMove('623PH', { dir: 6 }, { dir: 2 }, { dir: 3 }, { punch3: { down: true, pressed: true }});
+export const move421PL = createMove('421PL', { dir: 4 }, { dir: 2 }, { dir: 1 }, { punch1: { down: true, pressed: true }});
+export const move421PM = createMove('421PM', { dir: 4 }, { dir: 2 }, { dir: 1 }, { punch2: { down: true, pressed: true }});
+export const move421PH = createMove('421PH', { dir: 4 }, { dir: 2 }, { dir: 1 }, { punch3: { down: true, pressed: true }});
 
-export const move623PL = createMove(
-    '623PL',
-    [step(6), step(2), step(3, 'punch1')],
-    [step(6), step(2), step(3), step(3, 'punch1')],
-    [step(6), step(5), step(2), step(3, 'punch1')],
-    [step(6), step(5), step(2), step(3), step(3, 'punch1')],
-);
-export const move623PM = copyMoveButtonToButton(move623PL, '623PM', 'punch1', 'punch2');
-export const move623PH = copyMoveButtonToButton(move623PL, '623PH', 'punch1', 'punch3');
-export const move421PL = copyMoveDirectionChange(move623PL, '421PL', 'horizontal');
-export const move421PM = copyMoveDirectionChange(move623PM, '421PM', 'horizontal');
-export const move421PH = copyMoveDirectionChange(move623PH, '421PH', 'horizontal');
+export const move236PL = createMove('236PL', { dir: 2 }, { dir: 3 }, { dir: 6 }, { punch1: { down: true, pressed: true }});
+export const move236PM = createMove('236PM', { dir: 2 }, { dir: 3 }, { dir: 6 }, { punch2: { down: true, pressed: true }});
+export const move236PH = createMove('236PH', { dir: 2 }, { dir: 3 }, { dir: 6 }, { punch3: { down: true, pressed: true }});
+export const move214PL = createMove('214PL', { dir: 2 }, { dir: 1 }, { dir: 4 }, { punch1: { down: true, pressed: true }});
+export const move214PM = createMove('214PM', { dir: 2 }, { dir: 1 }, { dir: 4 }, { punch2: { down: true, pressed: true }});
+export const move214PH = createMove('214PH', { dir: 2 }, { dir: 1 }, { dir: 4 }, { punch3: { down: true, pressed: true }});
 
-export const move236PL = createMove(
-    '236PL',
-    [step(2), step(3), step(6, 'punch1')],
-    [step(2), step(3), step(6), step(6, 'punch1')],
-);
-export const move236PM = copyMoveButtonToButton(move236PL, '236PM', 'punch1', 'punch2');
-export const move236PH = copyMoveButtonToButton(move236PL, '236PH', 'punch1', 'punch3');
-export const move214PL = copyMoveDirectionChange(move236PL, '214PL', 'horizontal');
-export const move214PM = copyMoveDirectionChange(move236PM, '214PM', 'horizontal');
-export const move214PH = copyMoveDirectionChange(move236PH, '214PH', 'horizontal');
+export const move41236PL = createMove('41236PL', { dir: 4 }, { dir: 1 }, { dir: 2 }, { dir: 3 }, { dir: 6 }, { punch1: { down: true, pressed: true} });
+export const move63214PL = createMove('63214PL', { dir: 6 }, { dir: 3 }, { dir: 2 }, { dir: 1 }, { dir: 4 }, { punch1: { down: true, pressed: true} });
 
-export const move41236PL = createMove(
-    '41236PL',
-    [step(4), step(1), step(2), step(3), step(6, 'punch1')],
-    [step(4), step(1), step(2), step(3), step(6), step(6, 'punch1')],
-);
-export const move63214PL = copyMoveDirectionChange(move41236PL, '63214PL', 'horizontal');
-
-export const move66 = createMove('66', [step(6), step(5), step(6)]);
-export const move44 = copyMoveDirectionChange(move66, '44', 'horizontal');
-export const move22 = createMove('22', [step(2), step(5), step(2)]);
-export const move88 = copyMoveDirectionChange(move22, '88', 'vertical');
-
-const directionIsCardinal = (direction: Direction) => {
-    if (direction === 2) return true;
-    if (direction === 4) return true;
-    if (direction === 6) return true;
-    if (direction === 8) return true;
-    return false;
-};
-
-/**
- * Given 2 cardinal directions, determine rotation between them.
- * Returns false if directions do not form a rotation.
- * 
- * @param from 
- * @param to 
- * @returns 
- */
-const getRotationBetweenCardinals = (from: (2 | 4 | 6 | 8), to: (2 | 4 | 6 | 8)) => {
-    if (from === 2 && to === 8) return false;
-    else if (from === 2 && to === 4) return 'clockwise';
-    else if (from === 2 && to === 6) return 'counter';
-    else if (from === 4 && to === 6) return false;
-    else if (from === 4 && to === 8) return 'clockwise';
-    else if (from === 4 && to === 2) return 'counter';
-    else if (from === 8 && to === 2) return false;
-    else if (from === 8 && to === 6) return 'clockwise';
-    else if (from === 8 && to === 4) return 'counter';
-    else if (from === 6 && to === 4) return false;
-    else if (from === 6 && to === 2) return 'clockwise';
-    else if (from === 6 && to === 8) return 'counter';
-    return false;
-};
+export const move66 = createMove('66', { dir: 6 }, { dir: 5 }, { dir: 6 });
+export const move44 = createMove('44', { dir: 4 }, { dir: 5 }, { dir: 4 });
+export const move22 = createMove('22', { dir: 2 }, { dir: 5 }, { dir: 2 });
+export const move88 = createMove('88', { dir: 8 }, { dir: 5 }, { dir: 8 });
 
 /*
     The typical 360 move is not determined with strict inputs. In most games, as long
     as the user hits all cardinal directions in a clockwise or counter-clockwise order,
-    the game gives them the move. This logic here recreates that.
+    the game gives them the move.
 */
-export const move360PL: Move = {
-    ...createMove('360PL', []),
-    getHistoryMatch: 'circlePunch1',
-};

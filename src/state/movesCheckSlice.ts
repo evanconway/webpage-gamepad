@@ -35,7 +35,7 @@ const initialState: InitialState = {
     targetMove: initialStateMoves[0],
 };
 
-initialState.moves.sort((a, b) => b.inputHistories[0].length - a.inputHistories[0].length);
+initialState.moves.sort((a, b) => b.steps[0].length - a.steps[0].length);
 
 export const movesCheckSlice = createSlice({
     name: 'moves-check',
@@ -45,7 +45,7 @@ export const movesCheckSlice = createSlice({
             const existingMoveindex = state.moves.findIndex(m => m.name === action.payload.name);
             if (existingMoveindex >= 0) return;
             state.moves.push(action.payload);
-            state.moves.sort((a, b) => b.inputHistories[0].length - a.inputHistories[0].length);
+            state.moves.sort((a, b) => b.steps[0].length - a.steps[0].length);
         },
         removeMove: (state, action: PayloadAction<Move>) => {
             state.moves = state.moves.filter(m => m.name !== action.payload.name);
