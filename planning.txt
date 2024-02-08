@@ -186,3 +186,9 @@ We should change how individual move states work so that we're only checking for
 Let's add the idea that we'll check move steps against the same history step until it's not valid. This will resolve our issue of needing different definitions of 236P and similar moves where 1 version has a final step of 6P, and one version has a final step of just P.
 
 For next time we need to think through more clearly how down vs pressed is going to work. We'll also need to think about this for direction as well.
+
+
+7th of February, 2024
+
+Still struggling to really get re-started on this thing. But I had a thought:
+We want to interpret moves from start to finish for determining if we did a move wrong. We want to interpret moves from end to start to determine if a move was performed. What if we made a function which just iterated over the move steps and history forwards or backwards depending on an optional variable?
