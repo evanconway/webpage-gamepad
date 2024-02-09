@@ -1,7 +1,5 @@
 import { ArcadeButton, ArcadeDirection, ArcadeStickHistoryState } from "../state/arcadeStickHistorySlice";
 
-const MAX_TIME_BETWEEN_INPUTS_MS = 200;
-
 // Most moves can simply check against a variety of input histories. We define those here.
 
 interface MoveStep {
@@ -53,20 +51,40 @@ const moveStepMatchesHistoryState = (moveStep: MoveStep, historyStep: ArcadeStic
     return true;
 };
 
-export const arcadeStickHistoryMatchMove = (history: ArcadeStickHistoryState[], move: Move) => {
+const isNeutralInput = (historyStep: ArcadeStickHistoryState) => {
+    if (historyStep.direction.direction !== 5) return false;
+    if (historyStep.punch1.down) return false;
+    if (historyStep.punch2.down) return false;
+    if (historyStep.punch3.down) return false;
+    if (historyStep.kick1.down) return false;
+    if (historyStep.kick2.down) return false;
+    if (historyStep.kick3.down) return false;
+    return true;
+};
+
+export const arcadeStickHistoryMatchMove = (history: ArcadeStickHistoryState[], move: Move, reverse?: boolean) => {
+    const stepsHistory = reverse ? [...history].reverse() : history;
+    const stepsMove = reverse ? [...move.steps].reverse() : move.steps;
     // recall that now both history and move.steps are in the same order
     // iterate over history, checking each state to see if it matches a move step
     // when a state matches a step we don't advance to the next history state, instead we advance the move step being checked
-    const steps = move.steps;
     let indexHistory = 0;
     let indexMove = 0;
-    while (indexHistory < history.length && indexMove < move.steps.length) {
-        if (moveStepMatchesHistoryState(steps[indexMove], history[indexHistory])) indexMove++;
+    while (indexHistory < stepsHistory.length && indexMove < move.steps.length) {
+        const stepMove = stepsMove[indexMove];
+        const stepHistory = stepsHistory[indexHistory];
+
+        const match = moveStepMatchesHistoryState(stepMove, stepHistory);
+
+        // first steps must always match
+        if (!match && indexHistory === 0 && indexMove === 0) return false;
+
+        if (match) indexMove++;
         else indexHistory++;
     }
     // move is a match for history if all steps were matched 
-    if (indexMove >= steps.length) return true;
-    return false
+    if (indexMove >= stepsMove.length) return true;
+    return false;
 };
 
 export const createMove = (name: string, ...steps: MoveStep[]): Move => ({ name, steps });

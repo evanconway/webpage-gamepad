@@ -201,4 +201,6 @@ I think the simple idea of a function which compares input history against move 
 Oh wait... I think we already did that.
 
 
-I think it makes sense to store our input state history int he same order we store move steps. So from now on the end of the input history array is the most recent move.
+I think it makes sense to store our input state history in the same order we store move steps. So from now on the end of the input history array is the most recent move.
+
+
