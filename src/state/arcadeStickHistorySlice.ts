@@ -4,17 +4,19 @@ import { ArcadeStickState, Direction } from "./arcadeStickSlice";
 
 const MaxTrackedStates = 25;
 
-interface ArcadeButton {
+export interface ArcadeDirection {
+    direction: Direction,
+    pressed: boolean,
+}
+
+export interface ArcadeButton {
     down: boolean,
     pressed: boolean,
 }
 
 export interface ArcadeStickHistoryState {
     timeMs: number,
-    direction: {
-        direction: Direction,
-        pressed: boolean,
-    },
+    direction: ArcadeDirection,
     punch1: ArcadeButton,
     punch2: ArcadeButton,
     punch3: ArcadeButton,
@@ -55,8 +57,8 @@ export const arcadeStickHistorySlice = createSlice({
                 if (newHistoryState.kick3.down && !prev.kick3.down) newHistoryState.kick3.pressed = true;
             }
 
-            state.unshift(newHistoryState);
-            if (state.length > MaxTrackedStates) state.pop();
+            state.push(newHistoryState);
+            if (state.length > MaxTrackedStates) state.shift();
         },
     },
 });
