@@ -1,6 +1,7 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { RootState } from "./store";
-import { Move, arcadeStickHistoryMatchMove, move236PL, move236PM, move236PH, move214PL, move214PM, move214PH, move623PL, move623PM, move623PH, move421PH, move421PL, move421PM, move41236PL, move63214PL, move66, move44, move22, move88, move360PL } from "../util/moves";
+import { move236PL, move236PM, move236PH, move214PL, move214PM, move214PH, move623PL, move623PM, move623PH, move421PH, move421PL, move421PM, move41236PL, move63214PL, move66, move44, move22, move88 } from "../util/moves";
+import { Move, arcadeStickHistoryMatchMove } from "../util/moveFunctions";
 import { selectArcadeStickHistory } from "./arcadeStickHistorySlice";
 
 interface InitialState {
@@ -9,25 +10,24 @@ interface InitialState {
 }
 
 const initialStateMoves: Move[] = [
-        // move236PL,
-        // move236PM,
-        // move236PH,
-        // move214PL,
-        // move214PM,
-        // move214PH,
-        // move623PL,
-        // move623PM,
-        // move623PH,
-        // move421PL,
-        // move421PM,
-        // move421PH,
-        // move41236PL,
-        // move63214PL,
-        // move66,
-        // move44,
-        // move22,
-        // move88,
-        move360PL,
+        move236PL,
+        move236PM,
+        move236PH,
+        move214PL,
+        move214PM,
+        move214PH,
+        move623PL,
+        move623PM,
+        move623PH,
+        move421PL,
+        move421PM,
+        move421PH,
+        move41236PL,
+        move63214PL,
+        move66,
+        move44,
+        move22,
+        move88,
 ];
 
 const initialState: InitialState = {
@@ -35,7 +35,7 @@ const initialState: InitialState = {
     targetMove: initialStateMoves[0],
 };
 
-initialState.moves.sort((a, b) => b.steps[0].length - a.steps[0].length);
+initialState.moves.sort((a, b) => b.steps.length - a.steps.length);
 
 export const movesCheckSlice = createSlice({
     name: 'moves-check',
@@ -45,7 +45,7 @@ export const movesCheckSlice = createSlice({
             const existingMoveindex = state.moves.findIndex(m => m.name === action.payload.name);
             if (existingMoveindex >= 0) return;
             state.moves.push(action.payload);
-            state.moves.sort((a, b) => b.steps[0].length - a.steps[0].length);
+            state.moves.sort((a, b) => b.steps.length - a.steps.length);
         },
         removeMove: (state, action: PayloadAction<Move>) => {
             state.moves = state.moves.filter(m => m.name !== action.payload.name);
