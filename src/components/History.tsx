@@ -5,7 +5,16 @@ const History = () => {
     const history = useAppSelector(selectArcadeStickHistory);
 
     return <ul>
-        {history.map((s, i) => <li key={'history-' + i}>{`dir: ${s.direction}, p1: ${s.punch1}, p2: ${s.punch2}, p3: ${s.punch3}, k1: ${s.kick1}, k2: ${s.kick2}, k3: ${s.kick3}`}</li>)}
+        {history.map((s, i) =>{
+            let str = 'dir: ' + s.direction.direction;
+            if (s.punch1.down) str += ', p1';
+            if (s.punch2.down) str += ', p2';
+            if (s.punch3.down) str += ', p3';
+            if (s.kick1.down) str += ', k1';
+            if (s.kick2.down) str += ', k2';
+            if (s.kick3.down) str += ', k3';
+            return <li key={'history-' + i}>{str}</li>
+        })}
     </ul>;
 };
 
