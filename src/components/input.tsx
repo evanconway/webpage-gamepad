@@ -53,7 +53,6 @@ const Input = () => {
     const stickState = useAppSelector(selectArcadeStickState);
 
     useEffect(() => {
-        console.log('adding new stick state to history')
         dispatch(addArcadeStickState(stickState));
     }, [dispatch, stickState]);
 

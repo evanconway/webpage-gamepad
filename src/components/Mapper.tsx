@@ -57,7 +57,7 @@ const Mapper = () => {
 
         keyboardRef.current = keyboard;
         gamepadsRef.current = gamepads;
-    }, [keyboard, gamepads, actionMapper, dispatch]);
+    }, [keyboard, gamepads, actionMapper]);
 
     const {
         directionLeft,
@@ -94,7 +94,7 @@ const Mapper = () => {
             {[
                 <h3 key='action'>Action</h3>,
                 <h3 key='input'>Input</h3>,
-                <button key='assign-all' onClick={() => {
+                <button disabled={actionMapper !== null} key='assign-all' onClick={() => {
                     const actionMapperKick3: ActionMapper = {
                         actionName: ActionNames.kick3,
                         mapActionFunction: (newMapping) => dispatch(setActionKick3(newMapping)),
