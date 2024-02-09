@@ -72,7 +72,7 @@ export const selectMatchedMove = (state: RootState) => {
     const arcadeStickHistory = selectArcadeStickHistory(state);
     for (let i = 0; i < state.movesCheck.moves.length; i++) {
         const move = state.movesCheck.moves[i];
-        if (arcadeStickHistoryMatchMove(arcadeStickHistory, move)) return move;
+        if (arcadeStickHistoryMatchMove(arcadeStickHistory, move, true)) return move;
     }
     return null;
 };

@@ -50,19 +50,19 @@ interface InitialState {
 const initialState: InitialState = {
     directionUp: {
         port: 0,
-        input: 'pad-up',
+        input: 'stick-left-up',
     },
     directionDown: {
         port: 0,
-        input: 'pad-down',
+        input: 'stick-left-down',
     },
     directionLeft: {
         port: 0,
-        input: 'pad-left',
+        input: 'stick-left-left',
     },
     directionRight: {
         port: 0,
-        input: 'pad-right',
+        input: 'stick-left-right',
     },
     punch1: {
         port: 0,
